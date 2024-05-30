@@ -32,6 +32,11 @@
                 </div>
             </nav>
         </div>
+        <nav>
+            <button onclick="filterByDate()">Next Delivery Date</button>
+            <button onclick="filterByCourse()">Course</button>
+            <button onclick="filterByImportance()">Importance</button>
+        </nav>
     </header>
     <main class="mdl-layout__content">
         <div class="page-content">
@@ -43,6 +48,9 @@
             <p>&copy; 2024 SyncCal</p>
         </div>
     </footer>
+    <button onclick="handleAuthClick()">Sign In</button>
+    <button onclick="handleSignoutClick()">Sign Out</button>
+    <script src="https://apis.google.com/js/api.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
