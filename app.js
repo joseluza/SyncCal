@@ -1,9 +1,9 @@
-const CLIENT_ID = '1007808016979-rm131pqv458qpg0pk0qi1blhusdhfs5n.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyDdKNxOkM7gT9K50qTRQjhR-nW_C_MS_8c';
+const CLIENT_ID = 'TU_CLIENT_ID'; // Reemplaza con tu ID de cliente de Google
+const API_KEY = 'TU_API_KEY'; // Reemplaza con tu clave de API de Google
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
-// Load the API client and auth2 library
+// Cargar la biblioteca de cliente de la API y auth2
 function handleClientLoad() {
     gapi.load('client:auth2', initClient);
 }
@@ -14,12 +14,12 @@ function initClient() {
         clientId: CLIENT_ID,
         discoveryDocs: DISCOVERY_DOCS,
         scope: SCOPES
-    }).then(function () {
-        // Listen for sign-in state changes
+    }).then(() => {
+        // Escuchar cambios en el estado de autenticación
         gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-        // Handle the initial sign-in state
+        // Manejar el estado de autenticación inicial
         updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-    }, function(error) {
+    }, (error) => {
         console.error(JSON.stringify(error, null, 2));
     });
 }
@@ -57,7 +57,7 @@ function listUpcomingEvents() {
         'singleEvents': true,
         'maxResults': 10,
         'orderBy': 'startTime'
-    }).then(function(response) {
+    }).then((response) => {
         const events = response.result.items;
         renderCalendar(events);
     });
@@ -65,29 +65,27 @@ function listUpcomingEvents() {
 
 function renderCalendar(events) {
     const calendarDiv = document.getElementById('calendar');
-    calendarDiv.innerHTML = ''; // Clear previous events
+    calendarDiv.innerHTML = ''; // Limpiar eventos anteriores
 
     events.forEach(event => {
         const eventDiv = document.createElement('div');
         eventDiv.className = 'event';
         const when = event.start.dateTime || event.start.date;
-        eventDiv.innerText = `${event.summary} (${when})`;
+        eventDiv.innerText = `${event.summary} (${new Date(when).toLocaleString()})`;
         calendarDiv.appendChild(eventDiv);
     });
 }
 
 function filterByDate() {
-    // Implement filter logic by date
+    // Implementar lógica de filtrado por fecha
 }
 
 function filterByCourse() {
-    // Implement filter logic by course
+    // Implementar lógica de filtrado por curso
 }
 
 function filterByImportance() {
-    // Implement filter logic by importance
+    // Implementar lógica de filtrado por importancia
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    handleClientLoad();
-});
+document.addEventListener('DOMContentLoaded', handleClientLoad);
