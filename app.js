@@ -31,7 +31,7 @@ function updateSigninStatus(isSignedIn) {
         document.getElementById('user-email').textContent = `Signed in as: ${profile.getEmail()}`;
         document.getElementById('sign-in-btn').style.display = 'none';
         document.getElementById('sign-out-btn').style.display = 'inline-block';
-        listUpcomingEvents();
+        loadCalendar();
     } else {
         document.getElementById('user-email').textContent = '';
         document.getElementById('sign-in-btn').style.display = 'inline-block';
@@ -49,30 +49,39 @@ function handleSignoutClick(event) {
     });
 }
 
-function listUpcomingEvents() {
-    gapi.client.calendar.events.list({
-        'calendarId': 'primary',
-        'timeMin': (new Date()).toISOString(),
-        'showDeleted': false,
-        'singleEvents': true,
-        'maxResults': 10,
-        'orderBy': 'startTime'
-    }).then((response) => {
-        const events = response.result.items;
-        renderCalendar(events);
-    });
-}
-
-function renderCalendar(events) {
-    const calendarDiv = document.getElementById('calendar');
-    calendarDiv.innerHTML = ''; // Limpiar eventos anteriores
-
-    events.forEach(event => {
-        const eventDiv = document.createElement('div');
-        eventDiv.className = 'event';
-        const when = event.start.dateTime || event.start.date;
-        eventDiv.innerText = `${event.summary} (${new Date(when).toLocaleString()})`;
-        calendarDiv.appendChild(eventDiv);
+function loadCalendar() {
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        editable: false,
+        eventLimit: true,
+        events: function(start, end, timezone, callback) {
+            gapi.client.calendar.events.list({
+                'calendarId': 'primary',
+                'timeMin': start.toISOString(),
+                'timeMax': end.toISOString(),
+                'showDeleted': false,
+                'singleEvents': true,
+                'maxResults': 100,
+                'orderBy': 'startTime'
+            }).then((response) => {
+                var events = response.result.items.map(event => {
+                    return {
+                        title: event.summary,
+                        start: event.start.dateTime || event.start.date,
+                        end: event.end.dateTime || event.end.date,
+                        description: event.description
+                    };
+                });
+                callback(events);
+            });
+        },
+        eventClick: function(event) {
+            alert('Event: ' + event.title + '\nDescription: ' + event.description + '\nStart: ' + event.start.format() + '\nEnd: ' + event.end.format());
+        }
     });
 }
 
