@@ -4,6 +4,10 @@ body {
     padding: 0;
 }
 
+.mdl-layout__header {
+    background-color: #123740;
+}
+
 .logo {
     width: 50px;
     height: 50px;

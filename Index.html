@@ -14,7 +14,7 @@
     <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
-    <header class="mdl-layout__header">
+    <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
         <div class="mdl-layout__header-row">
             <span class="mdl-layout-title">
                 <img src="SyncCal.png" alt="SyncCal Logo" class="logo">
@@ -22,13 +22,13 @@
             </span>
             <div class="mdl-layout-spacer"></div>
             <nav class="mdl-navigation">
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" onclick="filterByDate()">Next Delivery Date</button>
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" onclick="filterByCourse()">Course</button>
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" onclick="filterByImportance()">Importance</button>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="filterByDate()">Next Delivery Date</button>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="filterByCourse()">Course</button>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="filterByImportance()">Importance</button>
                 <div class="auth-container">
                     <span id="user-email" class="mdl-navigation__link"></span>
-                    <button id="sign-in-btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" onclick="handleAuthClick()">Sign In</button>
-                    <button id="sign-out-btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" onclick="handleSignoutClick()" style="display: none;">Sign Out</button>
+                    <button id="sign-in-btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="handleAuthClick()">Sign In</button>
+                    <button id="sign-out-btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="handleSignoutClick()" style="display: none;">Sign Out</button>
                 </div>
             </nav>
         </div>
