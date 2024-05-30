@@ -3,7 +3,6 @@ const API_KEY = 'AIzaSyDdKNxOkM7gT9K50qTRQjhR-nW_C_MS_8c';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
-// Load the API client and auth2 library
 function handleClientLoad() {
     gapi.load('client:auth2', initClient);
 }
@@ -15,10 +14,7 @@ function initClient() {
         discoveryDocs: DISCOVERY_DOCS,
         scope: SCOPES
     }).then(function () {
-        // Listen for sign-in state changes
         gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-
-        // Handle the initial sign-in state
         updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
     }, function(error) {
         console.error(JSON.stringify(error, null, 2));
@@ -27,9 +23,16 @@ function initClient() {
 
 function updateSigninStatus(isSignedIn) {
     if (isSignedIn) {
+        const user = gapi.auth2.getAuthInstance().currentUser.get();
+        const profile = user.getBasicProfile();
+        document.getElementById('user-email').textContent = profile.getEmail();
+        document.getElementById('sign-in-btn').style.display = 'none';
+        document.getElementById('sign-out-btn').style.display = 'block';
         listUpcomingEvents();
     } else {
-        console.log("Not signed in");
+        document.getElementById('user-email').textContent = '';
+        document.getElementById('sign-in-btn').style.display = 'block';
+        document.getElementById('sign-out-btn').style.display = 'none';
     }
 }
 
@@ -80,7 +83,6 @@ function filterByImportance() {
     // Implement filter logic by importance
 }
 
-// Load the API and make an API call. Display the results on the screen.
 document.addEventListener('DOMContentLoaded', function() {
     handleClientLoad();
 });
