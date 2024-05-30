@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncCal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="SyncCal.png" alt="SyncCal Logo" class="logo">
+            <h1>SyncCal - Combined Calendar</h1>
+        </div>
+        <nav>
+            <button onclick="filterByDate()">Next Delivery Date</button>
+            <button onclick="filterByCourse()">Course</button>
+            <button onclick="filterByImportance()">Importance</button>
+        </nav>
+    </header>
+    <main>
+        <div id="calendar"></div>
+    </main>
+    <footer>
+        <p>&copy; 2024 SyncCal</p>
+    </footer>
+    <button onclick="handleAuthClick()">Sign In</button>
+    <button onclick="handleSignoutClick()">Sign Out</button>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #123740;
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    margin-right: 1rem;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+nav button {
+    margin: 0.5rem;
+    padding: 0.5rem;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+main {
+    padding: 1rem;
+}
+
+#calendar {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+footer {
+    background-color: #123740;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
