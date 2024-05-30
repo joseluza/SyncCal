@@ -1,0 +1,18 @@
+Creacion una aplicación en HTML, que combine Google Calendar y Calendario de Outlook, donde pueda ver lo que tengo registrado en ambos calendarios
+
+- Quiero poder filtrar por prox fecha de entraga, por "Curso" o por importancia
+
+- A la hora de registrar que me pida los datos por api
+
+- Quiero que el calendario tenga varios aspectos de visualización
+
+- Quiero que la pagina HTML tenga diseño y estrcutrua
+
+
+-----
+
+Una vez establecidos los requisitos iniciales, seguiremos en hacerlo por pasos:
+
+1, Desarrollo en Visual Studio Code como hacerlo de forma local (Trabajemos con HTML, css, js)
+2, Conexion de las APIs para el funcionamiento de la pagina
+3, Alojamiento en la nube y servicio utilizado
