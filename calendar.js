@@ -32,7 +32,7 @@ function loadEventsFromIndexedDB() {
         request.onsuccess = (event) => {
             const events = event.target.result;
             events.forEach(event => {
-                calendar.addEvent(event);
+                addEventToCalendar(event);
                 addEventToPendingTasks(event);
             });
         };
@@ -264,4 +264,63 @@ function updatePendingTasks(events) {
     events.forEach(event => {
         addEventToPendingTasks(event);
     });
+}
+// Función para eliminar eventos
+function deleteEvent(eventId) {
+    const request = indexedDB.open('SyncCalDB', 1);
+
+    request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(['events'], 'readwrite');
+        const objectStore = transaction.objectStore('events');
+        const deleteRequest = objectStore.delete(eventId);
+
+        deleteRequest.onsuccess = () => {
+            console.log('El evento ha sido eliminado de la base de datos.');
+            // Eliminar el evento del calendario
+            const calendarEvent = calendar.getEventById(eventId);
+            if (calendarEvent) {
+                calendarEvent.remove();
+            }
+            // Eliminar el evento de las tareas pendientes
+            removeEventFromPendingTasks(eventId);
+        };
+
+        deleteRequest.onerror = () => {
+            console.error('Error al eliminar el evento de la base de datos.');
+        };
+    };
+
+    request.onerror = (event) => {
+        console.error('Error en la base de datos: ' + event.target.errorCode);
+    };
+}
+
+// Función para eliminar eventos de la lista de tareas pendientes
+function removeEventFromPendingTasks(eventId) {
+    const taskList = document.getElementById('pending-tasks-list');
+    const taskItems = Array.from(taskList.children);
+    const taskItem = taskItems.find(item => item.dataset.id === eventId);
+    if (taskItem) {
+        taskList.removeChild(taskItem);
+    }
+}
+
+// Añadir botón de eliminación en el modal de detalles del evento
+function showEventDetails(event) {
+    document.getElementById('modal-event-title').textContent = event.title;
+    document.getElementById('modal-event-start').textContent = formatDateTime(event.start);
+    document.getElementById('modal-event-end').textContent = formatDateTime(event.end);
+    document.getElementById('modal-event-location').textContent = event.location;
+    document.getElementById('modal-event-description').textContent = event.description;
+    document.getElementById('modal-event-link').textContent = event.extendedProps.link;
+    document.getElementById('modal-event-link').href = event.extendedProps.link;
+    document.getElementById('modal-event-course').textContent = event.extendedProps.course;
+    document.getElementById('modal-event-delivery').textContent = event.extendedProps.delivery;
+    document.getElementById('modal-event-importance').textContent = event.extendedProps.importance;
+
+    const eventDetailsModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+    eventDetailsModal.show();
+
+    document.getElementById('delete-event-btn').onclick = () => deleteEvent(event.id);
 }

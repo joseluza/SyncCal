@@ -1,7 +1,13 @@
 Historial de Versiones
+Versión: 1.6.3
+Fecha: 2024-05-31
+Cambios:
+- Agregado botón para eliminar eventos.
+- Asegurada la carga y visualización de eventos en el calendario.
+- Permitida la edición de eventos existentes.
 
 Versión: 1.6.2
-Fecha: 2024-06-06
+Fecha: 2024-05-31
 Cambios:
 - Corrección en la carga y visualización del calendario.
 - Ajuste en la disposición de la sección de tareas pendientes.
@@ -9,7 +15,7 @@ Cambios:
 
 
 Versión: 1.6.1
-Fecha: 2024-06-06
+Fecha: 2024-05-31
 Cambios:
 - Solucion de Perdida de HTML
 - Correcion de Calendario
@@ -17,7 +23,7 @@ Cambios:
 - Correcion de Formulario
 
 Versión: 1.6.0
-Fecha: 2024-06-06
+Fecha: 2024-05-31
 Cambios:
 - Mejorada la funcionalidad para editar eventos.
 - Detalles del evento mostrados en un modal al hacer clic en un evento, incluyendo documentos adjuntos y enlaces.
