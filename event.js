@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 end: document.getElementById('event-end').value,
                 location: document.getElementById('event-location').value,
                 description: document.getElementById('event-description').value,
-                attachments: document.getElementById('event-attachments').files,
+                attachments: Array.from(document.getElementById('event-attachments').files).map(file => file.name),
                 link: document.getElementById('event-link').value,
                 course: document.getElementById('event-course').value
             };
@@ -38,19 +38,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const request = objectStore.add(newEvent);
 
             request.onsuccess = () => {
-                console.log('Event has been added to your database.');
+                console.log('El evento ha sido añadido a la base de datos.');
                 form.reset();
+                form.style.display = 'none';
                 addEventToCalendar(newEvent);
             };
 
             request.onerror = () => {
-                console.error('Error adding event to database.');
+                console.error('Error al añadir el evento a la base de datos.');
             };
         });
     };
 
     request.onerror = (event) => {
-        console.error('Database error: ' + event.target.errorCode);
+        console.error('Error en la base de datos: ' + event.target.errorCode);
     };
 });
 

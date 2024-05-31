@@ -1,4 +1,14 @@
 Historial de Versiones
+Versión: 1.5.1
+Fecha: 2024-05-31
+Cambios:
+- Implementación de la funcionalidad para mostrar la información del usuario autenticado (nombre, correo electrónico, foto de perfil).
+- Creación de un formulario para la creación de eventos que aparece al hacer clic en una fecha del calendario.
+- Mejora del almacenamiento de eventos en IndexedDB.
+- Mejora de la integración de eventos creados con el calendario.
+- Mejora de la interfaz de usuario y responsividad.
+- Correcion para mostrar el correo del usuario cuando está logueado (Intento 6).
+
 Versión: 1.5.0
 Fecha: 2024-05-31
 Cambios:

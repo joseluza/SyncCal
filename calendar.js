@@ -8,6 +8,9 @@ function initializeEmptyCalendar() {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        dateClick: function(info) {
+            showEventForm(info.dateStr);
         }
     });
     calendar.render();
@@ -44,4 +47,12 @@ function loadCalendarEvents() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeEmptyCalendar();
+    loadCalendarEvents();
 });
+
+function showEventForm(dateStr) {
+    const form = document.getElementById('event-form');
+    form.style.display = 'block';
+    document.getElementById('event-start').value = dateStr + "T00:00";
+    document.getElementById('event-end').value = dateStr + "T23:59";
+}
