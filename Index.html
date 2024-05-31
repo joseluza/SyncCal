@@ -27,7 +27,10 @@
                 <div class="auth-container">
                     <span id="user-email" class="mdl-navigation__link"></span>
                     <button id="sign-in-btn" class="btn btn-secondary" onclick="handleAuthClick()">Sign In</button>
-                    <button id="sign-out-btn" class="btn btn-secondary" onclick="handleSignoutClick()" style="display: none;">Sign Out</button>
+                    <div id="user-info" style="display: none;">
+                        <span>Session as: <strong id="user-name"></strong></span>
+                        <button id="sign-out-btn" class="btn btn-secondary" onclick="handleSignoutClick()">Sign Out</button>
+                    </div>
                 </div>
             </nav>
         </div>
@@ -42,6 +45,8 @@
             <p>&copy; 2024 SyncCal</p>
         </div>
     </footer>
-    <script src="app.js"></script>
+    <script src="auth.js"></script>
+    <script src="calendar.js"></script>
+    <script src="filters.js"></script>
 </body>
 </html>

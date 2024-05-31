@@ -20,10 +20,10 @@ body {
 .auth-container {
     display: flex;
     align-items: center;
+    gap: 10px;
 }
 
 .auth-container span {
-    margin-right: 1rem;
     font-weight: bold;
     color: white;
 }
