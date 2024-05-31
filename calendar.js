@@ -67,8 +67,8 @@ function showEventForm(dateStr) {
 
 function showEventDetails(event) {
     document.getElementById('modal-event-title').textContent = event.title;
-    document.getElementById('modal-event-start').textContent = event.start.toISOString().slice(0, 16).replace('T', ' ');
-    document.getElementById('modal-event-end').textContent = event.end.toISOString().slice(0, 16).replace('T', ' ');
+    document.getElementById('modal-event-start').textContent = formatDateTime(event.start);
+    document.getElementById('modal-event-end').textContent = formatDateTime(event.end);
     document.getElementById('modal-event-location').textContent = event.location;
     document.getElementById('modal-event-description').textContent = event.description;
     document.getElementById('modal-event-link').textContent = event.link;
@@ -80,13 +80,25 @@ function showEventDetails(event) {
     if (event.extendedProps.attachments) {
         event.extendedProps.attachments.forEach(attachment => {
             const li = document.createElement('li');
-            li.textContent = attachment;
+            const a = document.createElement('a');
+            a.href = attachment;
+            a.textContent = attachment;
+            a.target = '_blank';
+            li.appendChild(a);
             attachmentsList.appendChild(li);
         });
     }
 
     const eventDetailsModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
     eventDetailsModal.show();
+}
+
+function formatDateTime(date) {
+    return new Date(date).toLocaleString('es-ES', {
+        dateStyle: 'full',
+        timeStyle: 'short',
+        hour12: false
+    });
 }
 
 function editEvent() {
@@ -100,8 +112,8 @@ function editEvent() {
     const eventAttachments = Array.from(document.getElementById('modal-event-attachments').children).map(li => li.textContent);
 
     document.getElementById('event-title').value = eventTitle;
-    document.getElementById('event-start').value = eventStart.replace(' ', 'T');
-    document.getElementById('event-end').value = eventEnd.replace(' ', 'T');
+    document.getElementById('event-start').value = new Date(eventStart).toISOString().slice(0, 16);
+    document.getElementById('event-end').value = new Date(eventEnd).toISOString().slice(0, 16);
     document.getElementById('event-location').value = eventLocation;
     document.getElementById('event-description').value = eventDescription;
     document.getElementById('event-link').value = eventLink;
@@ -121,6 +133,7 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
     const isEditing = document.getElementById('event-form').dataset.editing === 'true';
 
     const updatedEvent = {
+        id: document.getElementById('modal-event-title').dataset.id,
         title: document.getElementById('event-title').value,
         start: document.getElementById('event-start').value,
         end: document.getElementById('event-end').value,
@@ -147,7 +160,6 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
 });
 
 function updateEventInIndexedDB(event) {
-    // Implementación de la actualización en IndexedDB
     const request = indexedDB.open('SyncCalDB', 1);
 
     request.onsuccess = (event) => {
