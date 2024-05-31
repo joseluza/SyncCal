@@ -43,10 +43,20 @@
     <footer class="mdl-mini-footer">
         <div class="mdl-mini-footer--left-section">
             <p>&copy; 2024 SyncCal</p>
+            <p id="version-info"></p>
         </div>
     </footer>
     <script src="auth.js"></script>
     <script src="calendar.js"></script>
     <script src="filters.js"></script>
+    <script>
+        fetch('versiones.txt')
+            .then(response => response.text())
+            .then(data => {
+                const lines = data.split('\n');
+                const versionLine = lines.find(line => line.startsWith('Versión:'));
+                document.getElementById('version-info').textContent = versionLine; // Muestra la línea de la versión actual
+            });
+    </script>
 </body>
 </html>

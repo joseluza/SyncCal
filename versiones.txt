@@ -1,0 +1,32 @@
+Historial de Versiones
+Versión: 1.4.0
+Fecha: 2024-05-31
+Cambios:
+- Calendario vacío visible antes de iniciar sesión.
+- Ajustes adicionales en el CSS de los botones.
+- Corrección para mostrar el correo del usuario cuando está logueado.
+
+Versión: 1.3.0
+Fecha: 2024-05-31
+Cambios:
+- Refactorización de JavaScript en archivos separados para mejor mantenibilidad.
+- Mejora de la interfaz de usuario de inicio/cierre de sesión para reflejar el estado de la sesión.
+- Mejora del espaciado y disposición de los botones.
+
+Versión: 1.2.0
+Fecha: 2024-05-31
+Cambios:
+- Mejora de la interfaz de usuario con Bootstrap.
+- Añadido filtrado por fecha, curso e importancia.
+- Actualización de la posición del footer.
+
+Versión: 1.1.0
+Fecha: 2024-05-30
+Cambios:
+- Integración con Google Calendar.
+- Implementación de autenticación con Google Sign-In.
+
+Versión: 1.0.0
+Fecha: 2024-05-30
+Cambios:
+- Lanzamiento inicial con funcionalidad básica del calendario.
