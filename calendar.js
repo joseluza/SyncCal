@@ -271,10 +271,12 @@ function deleteEvent(eventId) {
 
         deleteRequest.onsuccess = () => {
             console.log('El evento ha sido eliminado de la base de datos.');
+            // Eliminar el evento del calendario
             const calendarEvent = calendar.getEventById(eventId);
             if (calendarEvent) {
                 calendarEvent.remove();
             }
+            // Eliminar el evento de las tareas pendientes
             removeEventFromPendingTasks(eventId);
         };
 
@@ -288,7 +290,6 @@ function deleteEvent(eventId) {
     };
 }
 
-// Función para eliminar eventos de la lista de tareas pendientes
 function removeEventFromPendingTasks(eventId) {
     const taskList = document.getElementById('pending-tasks-list');
     const taskItems = Array.from(taskList.children);
@@ -297,3 +298,4 @@ function removeEventFromPendingTasks(eventId) {
         taskList.removeChild(taskItem);
     }
 }
+
