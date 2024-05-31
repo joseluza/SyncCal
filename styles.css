@@ -22,6 +22,12 @@ body {
 .auth-container span {
     margin-right: 1rem;
     font-weight: bold;
+    color: white;
+}
+
+.mdl-button--accent {
+    background-color: #fff;
+    color: #123740;
 }
 
 main {

@@ -30,11 +30,12 @@ function updateSigninStatus(isSignedIn) {
         document.getElementById('user-email').textContent = `Signed in as: ${profile.getEmail()}`;
         document.getElementById('sign-in-btn').style.display = 'none';
         document.getElementById('sign-out-btn').style.display = 'inline-block';
-        loadCalendar();
+        loadCalendarEvents();
     } else {
         document.getElementById('user-email').textContent = '';
         document.getElementById('sign-in-btn').style.display = 'inline-block';
         document.getElementById('sign-out-btn').style.display = 'none';
+        initializeEmptyCalendar();
     }
 }
 
@@ -48,7 +49,7 @@ function handleSignoutClick(event) {
     });
 }
 
-function loadCalendar() {
+function initializeEmptyCalendar() {
     var calendarEl = document.getElementById('calendar');
     calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
@@ -56,33 +57,31 @@ function loadCalendar() {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        events: function(fetchInfo, successCallback, failureCallback) {
-            gapi.client.calendar.events.list({
-                'calendarId': 'primary',
-                'timeMin': fetchInfo.startStr,
-                'timeMax': fetchInfo.endStr,
-                'showDeleted': false,
-                'singleEvents': true,
-                'maxResults': 100,
-                'orderBy': 'startTime'
-            }).then((response) => {
-                var events = response.result.items.map(event => {
-                    return {
-                        title: event.summary,
-                        start: event.start.dateTime || event.start.date,
-                        end: event.end.dateTime || event.end.date,
-                        description: event.description
-                    };
-                });
-                successCallback(events);
-            });
-        },
-        eventClick: function(info) {
-            alert('Event: ' + info.event.title + '\nDescription: ' + info.event.extendedProps.description + '\nStart: ' + info.event.start.toISOString() + '\nEnd: ' + info.event.end.toISOString());
         }
     });
     calendar.render();
+}
+
+function loadCalendarEvents() {
+    calendar.removeAllEvents();
+    gapi.client.calendar.events.list({
+        'calendarId': 'primary',
+        'timeMin': new Date().toISOString(),
+        'showDeleted': false,
+        'singleEvents': true,
+        'maxResults': 100,
+        'orderBy': 'startTime'
+    }).then((response) => {
+        var events = response.result.items.map(event => {
+            return {
+                title: event.summary,
+                start: event.start.dateTime || event.start.date,
+                end: event.end.dateTime || event.end.date,
+                description: event.description
+            };
+        });
+        calendar.addEventSource(events);
+    });
 }
 
 function filterByDate() {
@@ -112,4 +111,7 @@ function filterByImportance() {
     filteredEvents.forEach(event => calendar.addEvent(event));
 }
 
-document.addEventListener('DOMContentLoaded', handleClientLoad);
+document.addEventListener('DOMContentLoaded', () => {
+    handleClientLoad();
+    initializeEmptyCalendar();
+});
