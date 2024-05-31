@@ -1,4 +1,12 @@
 Historial de Versiones
+Versión: 1.6.1
+Fecha: 2024-06-06
+Cambios:
+- Solucion de Perdida de HTML
+- Correcion de Calendario
+- Correcion de pendientes
+- Correcion de Formulario
+
 Versión: 1.6.0
 Fecha: 2024-06-06
 Cambios:
