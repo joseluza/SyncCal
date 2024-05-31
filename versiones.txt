@@ -1,4 +1,12 @@
 Historial de Versiones
+Versión: 1.4.2
+Fecha: 2024-05-31
+Cambios:
+- Implementación funcional de Google Identify Services.
+- Sincronizacion de eventos unidireccional
+- Implementación de gapi.client
+- Solucion del problema 'idpiframe_initialization-failed'
+
 Versión: 1.4.1
 Fecha: 2024-05-31
 Cambios:

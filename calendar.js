@@ -14,11 +14,12 @@ function initializeEmptyCalendar() {
 }
 
 function loadCalendarEvents() {
-    if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
+    if (accessToken === null) {
+        console.log('No access token available');
         return;
     }
-    
-    calendar.removeAllEvents();
+
+    gapi.client.setToken({ access_token: accessToken });
     gapi.client.calendar.events.list({
         'calendarId': 'primary',
         'timeMin': new Date().toISOString(),
@@ -36,6 +37,8 @@ function loadCalendarEvents() {
             };
         });
         calendar.addEventSource(events);
+    }).catch((error) => {
+        console.error('Error fetching calendar events:', error);
     });
 }
 
