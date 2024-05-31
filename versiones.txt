@@ -1,4 +1,13 @@
 Historial de Versiones
+
+Versión: 1.6.2
+Fecha: 2024-06-06
+Cambios:
+- Corrección en la carga y visualización del calendario.
+- Ajuste en la disposición de la sección de tareas pendientes.
+- Aseguramiento de la carga de scripts y estilos.
+
+
 Versión: 1.6.1
 Fecha: 2024-06-06
 Cambios:

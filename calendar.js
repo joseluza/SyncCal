@@ -47,6 +47,11 @@ function loadEventsFromIndexedDB() {
     };
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    initializeEmptyCalendar();
+    // loadCalendarEvents(); // Este método solo es necesario si estás cargando eventos desde Google Calendar.
+});
+
 function showEventForm(dateStr) {
     const form = document.getElementById('event-form');
     form.style.display = 'block';
