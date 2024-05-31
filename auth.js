@@ -28,11 +28,13 @@ function updateSigninStatus(isSignedIn) {
         document.getElementById('user-email').textContent = `Signed in as: ${profile.getEmail()}`;
         document.getElementById('sign-in-btn').style.display = 'none';
         document.getElementById('user-info').style.display = 'flex';
+        document.getElementById('sign-out-btn').style.display = 'inline-block';
         loadCalendarEvents();
     } else {
         document.getElementById('user-email').textContent = '';
         document.getElementById('sign-in-btn').style.display = 'inline-block';
         document.getElementById('user-info').style.display = 'none';
+        document.getElementById('sign-out-btn').style.display = 'none';
         initializeEmptyCalendar();
     }
 }

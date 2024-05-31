@@ -1,4 +1,11 @@
 Historial de Versiones
+Versión: 1.4.1
+Fecha: 2024-05-31
+Cambios:
+- Calendario vacío visible antes de iniciar sesión.
+- Ajustes adicionales en el regristo de fechas de forma local.
+- Corrección para mostrar el correo del usuario cuando está logueado (Intento 2).
+
 Versión: 1.4.0
 Fecha: 2024-05-31
 Cambios:

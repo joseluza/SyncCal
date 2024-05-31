@@ -14,6 +14,10 @@ function initializeEmptyCalendar() {
 }
 
 function loadCalendarEvents() {
+    if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
+        return;
+    }
+    
     calendar.removeAllEvents();
     gapi.client.calendar.events.list({
         'calendarId': 'primary',
