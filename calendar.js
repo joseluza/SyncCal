@@ -279,34 +279,6 @@ function updateEventInPendingTasks(event) {
     }
 }
 
-function filterByDate() {
-    const today = new Date().toISOString().split('T')[0];
-    const events = calendar.getEvents().filter(event => event.extendedProps.delivery === 'si' && event.start >= today);
-    events.sort((a, b) => new Date(a.start) - new Date(b.start));
-    updatePendingTasks(events);
-}
-
-function filterByCourse() {
-    const course = document.getElementById('event-course').value;
-    const events = calendar.getEvents().filter(event => event.extendedProps.course === course);
-    updatePendingTasks(events);
-}
-
-function filterByImportance() {
-    const importance = document.getElementById('event-importance').value;
-    const events = calendar.getEvents().filter(event => event.extendedProps.importance === importance);
-    updatePendingTasks(events);
-}
-
-function updatePendingTasks(events) {
-    const taskList = document.getElementById('pending-tasks-list');
-    taskList.innerHTML = '';
-    events.forEach(event => {
-        addEventToPendingTasks(event);
-    });
-}
-
-// Función para eliminar eventos
 function deleteEvent(eventId) {
     const request = indexedDB.open('SyncCalDB', 1);
 
@@ -335,7 +307,6 @@ function deleteEvent(eventId) {
     };
 }
 
-// Función para eliminar eventos de la lista de tareas pendientes
 function removeEventFromPendingTasks(eventId) {
     const taskList = document.getElementById('pending-tasks-list');
     const taskItems = Array.from(taskList.children);

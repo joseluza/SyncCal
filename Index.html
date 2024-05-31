@@ -22,9 +22,6 @@
             </span>
             <div class="mdl-layout-spacer"></div>
             <nav class="mdl-navigation">
-                <button class="btn btn-primary" onclick="filterByDate()">Próxima Fecha de Entrega</button>
-                <button class="btn btn-primary" onclick="filterByCourse()">Curso</button>
-                <button class="btn btn-primary" onclick="filterByImportance()">Importancia</button>
                 <div class="auth-container">
                     <img id="user-profile-picture" src="" alt="Foto de Perfil" style="display:none; width:30px; height:30px; border-radius:50%; margin-right:10px;">
                     <span id="user-email" class="mdl-navigation__link"></span>
@@ -40,7 +37,7 @@
     <main class="mdl-layout__content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-8" id="calendar-container">
                     <div id="calendar"></div>
                     <form id="event-form" class="mt-4" style="display:none;">
                         <div class="mb-3">
@@ -82,10 +79,10 @@
                             <label for="event-importance" class="form-label">Importancia</label>
                             <select class="form-select" id="event-importance">
                                 <option value="none">Ninguna</option>
-                                <option value="low">Baja</option>
-                                <option value="medium">Media</option>
-                                <option value="high">Alta</option>
-                                <option value="a1">A1</option>
+                                <option value="baja">Baja</option>
+                                <option value="media">Media</option>
+                                <option value="alta">Alta</option>
+                                <option value="muy-alta">Muy Alta</option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Crear Evento</button>
