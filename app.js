@@ -3,7 +3,8 @@ const API_KEY = 'AIzaSyDdKNxOkM7gT9K50qTRQjhR-nW_C_MS_8c';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
-// Cargar la biblioteca de cliente de la API y auth2
+let calendar;
+
 function handleClientLoad() {
     gapi.load('client:auth2', initClient);
 }
@@ -15,9 +16,7 @@ function initClient() {
         discoveryDocs: DISCOVERY_DOCS,
         scope: SCOPES
     }).then(() => {
-        // Escuchar cambios en el estado de autenticación
         gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-        // Manejar el estado de autenticación inicial
         updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
     }, (error) => {
         console.error(JSON.stringify(error, null, 2));
@@ -50,19 +49,19 @@ function handleSignoutClick(event) {
 }
 
 function loadCalendar() {
-    $('#calendar').fullCalendar({
-        header: {
+    var calendarEl = document.getElementById('calendar');
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'month,agendaWeek,agendaDay'
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
-        editable: false,
-        eventLimit: true,
-        events: function(start, end, timezone, callback) {
+        events: function(fetchInfo, successCallback, failureCallback) {
             gapi.client.calendar.events.list({
                 'calendarId': 'primary',
-                'timeMin': start.toISOString(),
-                'timeMax': end.toISOString(),
+                'timeMin': fetchInfo.startStr,
+                'timeMax': fetchInfo.endStr,
                 'showDeleted': false,
                 'singleEvents': true,
                 'maxResults': 100,
@@ -76,25 +75,41 @@ function loadCalendar() {
                         description: event.description
                     };
                 });
-                callback(events);
+                successCallback(events);
             });
         },
-        eventClick: function(event) {
-            alert('Event: ' + event.title + '\nDescription: ' + event.description + '\nStart: ' + event.start.format() + '\nEnd: ' + event.end.format());
+        eventClick: function(info) {
+            alert('Event: ' + info.event.title + '\nDescription: ' + info.event.extendedProps.description + '\nStart: ' + info.event.start.toISOString() + '\nEnd: ' + info.event.end.toISOString());
         }
     });
+    calendar.render();
 }
 
 function filterByDate() {
-    // Implementar lógica de filtrado por fecha
+    let events = calendar.getEvents();
+    let filteredEvents = events.filter(event => {
+        let today = new Date();
+        let eventDate = new Date(event.start);
+        return eventDate >= today;
+    });
+    calendar.removeAllEvents();
+    filteredEvents.forEach(event => calendar.addEvent(event));
 }
 
 function filterByCourse() {
-    // Implementar lógica de filtrado por curso
+    let course = prompt("Enter the course name to filter by:");
+    let events = calendar.getEvents();
+    let filteredEvents = events.filter(event => event.title.includes(course));
+    calendar.removeAllEvents();
+    filteredEvents.forEach(event => calendar.addEvent(event));
 }
 
 function filterByImportance() {
-    // Implementar lógica de filtrado por importancia
+    let importance = prompt("Enter the importance level to filter by (e.g., High, Medium, Low):");
+    let events = calendar.getEvents();
+    let filteredEvents = events.filter(event => event.extendedProps.importance === importance);
+    calendar.removeAllEvents();
+    filteredEvents.forEach(event => calendar.addEvent(event));
 }
 
 document.addEventListener('DOMContentLoaded', handleClientLoad);
