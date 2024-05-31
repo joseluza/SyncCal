@@ -49,7 +49,6 @@ function loadEventsFromIndexedDB() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeEmptyCalendar();
-    // loadCalendarEvents(); // Este método solo es necesario si estás cargando eventos desde Google Calendar.
 });
 
 function showEventForm(dateStr) {
@@ -73,6 +72,8 @@ function showEventDetails(event) {
 
     const eventDetailsModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
     eventDetailsModal.show();
+
+    document.getElementById('delete-event-btn').onclick = () => deleteEvent(event.id);
 }
 
 function formatDateTime(date) {
@@ -84,32 +85,25 @@ function formatDateTime(date) {
 }
 
 function editEvent() {
-    const eventTitle = document.getElementById('modal-event-title').textContent;
-    const eventStart = document.getElementById('modal-event-start').textContent;
-    const eventEnd = document.getElementById('modal-event-end').textContent;
-    const eventLocation = document.getElementById('modal-event-location').textContent;
-    const eventDescription = document.getElementById('modal-event-description').textContent;
-    const eventLink = document.getElementById('modal-event-link').textContent;
-    const eventCourse = document.getElementById('modal-event-course').textContent;
-    const eventDelivery = document.getElementById('modal-event-delivery').textContent;
-    const eventImportance = document.getElementById('modal-event-importance').textContent;
+    const eventId = document.getElementById('modal-event-title').dataset.id;
+    const event = calendar.getEventById(eventId);
 
-    document.getElementById('event-title').value = eventTitle;
-    document.getElementById('event-start').value = new Date(eventStart).toISOString().slice(0, 16);
-    document.getElementById('event-end').value = new Date(eventEnd).toISOString().slice(0, 16);
-    document.getElementById('event-location').value = eventLocation;
-    document.getElementById('event-description').value = eventDescription;
-    document.getElementById('event-link').value = eventLink;
-    document.getElementById('event-course').value = eventCourse;
-    document.getElementById('event-delivery').value = eventDelivery;
-    document.getElementById('event-importance').value = eventImportance;
+    document.getElementById('event-title').value = event.title;
+    document.getElementById('event-start').value = new Date(event.start).toISOString().slice(0, 16);
+    document.getElementById('event-end').value = new Date(event.end).toISOString().slice(0, 16);
+    document.getElementById('event-location').value = event.extendedProps.location;
+    document.getElementById('event-description').value = event.extendedProps.description;
+    document.getElementById('event-link').value = event.extendedProps.link;
+    document.getElementById('event-course').value = event.extendedProps.course;
+    document.getElementById('event-delivery').value = event.extendedProps.delivery;
+    document.getElementById('event-importance').value = event.extendedProps.importance;
 
     document.getElementById('event-form').style.display = 'block';
     const eventDetailsModal = bootstrap.Modal.getInstance(document.getElementById('eventDetailsModal'));
     eventDetailsModal.hide();
 
     document.getElementById('event-form').dataset.editing = true;
-    document.getElementById('event-form').dataset.id = event.id;
+    document.getElementById('event-form').dataset.id = eventId;
 }
 
 document.getElementById('event-form').addEventListener('submit', (e) => {
@@ -131,10 +125,8 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
     };
 
     if (isEditing) {
-        // Lógica para actualizar un evento existente en IndexedDB
         updateEventInIndexedDB(updatedEvent);
     } else {
-        // Lógica para añadir un nuevo evento
         addEventToIndexedDB(updatedEvent);
     }
 
@@ -154,7 +146,6 @@ function updateEventInIndexedDB(event) {
 
         request.onsuccess = () => {
             console.log('El evento ha sido actualizado en la base de datos.');
-            // Actualizar el evento en el calendario
             const calendarEvent = calendar.getEventById(event.id);
             if (calendarEvent) {
                 calendarEvent.setProp('title', event.title);
@@ -228,13 +219,14 @@ function addEventToPendingTasks(event) {
     const taskList = document.getElementById('pending-tasks-list');
     const taskItem = document.createElement('li');
     taskItem.textContent = `${event.title} - ${event.start}`;
+    taskItem.dataset.id = event.id;
     taskList.appendChild(taskItem);
 }
 
 function updateEventInPendingTasks(event) {
     const taskList = document.getElementById('pending-tasks-list');
     const taskItems = Array.from(taskList.children);
-    const taskItem = taskItems.find(item => item.textContent.startsWith(event.title));
+    const taskItem = taskItems.find(item => item.dataset.id === event.id);
     if (taskItem) {
         taskItem.textContent = `${event.title} - ${event.start}`;
     }
@@ -242,7 +234,8 @@ function updateEventInPendingTasks(event) {
 
 function filterByDate() {
     const today = new Date().toISOString().split('T')[0];
-    const events = calendar.getEvents().filter(event => event.start >= today);
+    const events = calendar.getEvents().filter(event => event.extendedProps.delivery === 'si' && event.start >= today);
+    events.sort((a, b) => new Date(a.start) - new Date(b.start));
     updatePendingTasks(events);
 }
 
@@ -265,6 +258,7 @@ function updatePendingTasks(events) {
         addEventToPendingTasks(event);
     });
 }
+
 // Función para eliminar eventos
 function deleteEvent(eventId) {
     const request = indexedDB.open('SyncCalDB', 1);
@@ -277,12 +271,10 @@ function deleteEvent(eventId) {
 
         deleteRequest.onsuccess = () => {
             console.log('El evento ha sido eliminado de la base de datos.');
-            // Eliminar el evento del calendario
             const calendarEvent = calendar.getEventById(eventId);
             if (calendarEvent) {
                 calendarEvent.remove();
             }
-            // Eliminar el evento de las tareas pendientes
             removeEventFromPendingTasks(eventId);
         };
 
@@ -304,23 +296,4 @@ function removeEventFromPendingTasks(eventId) {
     if (taskItem) {
         taskList.removeChild(taskItem);
     }
-}
-
-// Añadir botón de eliminación en el modal de detalles del evento
-function showEventDetails(event) {
-    document.getElementById('modal-event-title').textContent = event.title;
-    document.getElementById('modal-event-start').textContent = formatDateTime(event.start);
-    document.getElementById('modal-event-end').textContent = formatDateTime(event.end);
-    document.getElementById('modal-event-location').textContent = event.location;
-    document.getElementById('modal-event-description').textContent = event.description;
-    document.getElementById('modal-event-link').textContent = event.extendedProps.link;
-    document.getElementById('modal-event-link').href = event.extendedProps.link;
-    document.getElementById('modal-event-course').textContent = event.extendedProps.course;
-    document.getElementById('modal-event-delivery').textContent = event.extendedProps.delivery;
-    document.getElementById('modal-event-importance').textContent = event.extendedProps.importance;
-
-    const eventDetailsModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
-    eventDetailsModal.show();
-
-    document.getElementById('delete-event-btn').onclick = () => deleteEvent(event.id);
 }

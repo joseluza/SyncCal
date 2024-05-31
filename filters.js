@@ -1,26 +1,27 @@
 function filterByDate() {
-    let events = calendar.getEvents();
-    let filteredEvents = events.filter(event => {
-        let today = new Date();
-        let eventDate = new Date(event.start);
-        return eventDate >= today;
-    });
-    calendar.removeAllEvents();
-    filteredEvents.forEach(event => calendar.addEvent(event));
+    const events = calendar.getEvents().filter(event => event.extendedProps.delivery === 'si');
+    events.sort((a, b) => new Date(a.start) - new Date(b.start));
+    updatePendingTasks(events);
 }
 
 function filterByCourse() {
-    let course = prompt("Enter the course name to filter by:");
-    let events = calendar.getEvents();
-    let filteredEvents = events.filter(event => event.title.includes(course));
-    calendar.removeAllEvents();
-    filteredEvents.forEach(event => calendar.addEvent(event));
+    const course = prompt("Ingrese el nombre del curso para filtrar:");
+    const events = calendar.getEvents().filter(event => event.extendedProps.course.includes(course));
+    updatePendingTasks(events);
 }
 
 function filterByImportance() {
-    let importance = prompt("Enter the importance level to filter by (e.g., High, Medium, Low):");
-    let events = calendar.getEvents();
-    let filteredEvents = events.filter(event => event.extendedProps.importance === importance);
-    calendar.removeAllEvents();
-    filteredEvents.forEach(event => calendar.addEvent(event));
+    const importance = prompt("Ingrese el nivel de importancia para filtrar (ninguna, baja, media, alta, A1):");
+    const events = calendar.getEvents().filter(event => event.extendedProps.importance === importance);
+    updatePendingTasks(events);
+}
+
+function updatePendingTasks(events) {
+    const taskList = document.getElementById('pending-tasks-list');
+    taskList.innerHTML = '';
+    events.forEach(event => {
+        const taskItem = document.createElement('li');
+        taskItem.textContent = `${event.title} - ${event.start}`;
+        taskList.appendChild(taskItem);
+    });
 }

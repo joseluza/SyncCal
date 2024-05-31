@@ -1,4 +1,12 @@
 Historial de Versiones
+Versión: 1.6.4
+Fecha: 2024-05-31
+Cambios:
+- Implementación de botón para eliminar eventos.
+- Asegurada la carga y visualización de eventos en el calendario.
+- Corrección de la funcionalidad de edición de eventos.
+- Implementación de filtros para próxima fecha de entrega, curso e importancia.
+
 Versión: 1.6.3
 Fecha: 2024-05-31
 Cambios:
