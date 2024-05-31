@@ -40,7 +40,7 @@ main {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    min-height: 80vh; /* Ajuste para que el calendario ocupe la altura mínima y el footer no interfiera */
+    min-height: 80vh;
 }
 
 footer {
@@ -58,11 +58,13 @@ footer {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .mdl-navigation {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .btn {
