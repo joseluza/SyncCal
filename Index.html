@@ -75,6 +75,30 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Crear Evento</button>
             </form>
+            <div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="eventDetailsModalLabel">Detalles del Evento</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Título:</strong> <span id="modal-event-title"></span></p>
+                            <p><strong>Inicio:</strong> <span id="modal-event-start"></span></p>
+                            <p><strong>Fin:</strong> <span id="modal-event-end"></span></p>
+                            <p><strong>Ubicación:</strong> <span id="modal-event-location"></span></p>
+                            <p><strong>Descripción:</strong> <span id="modal-event-description"></span></p>
+                            <p><strong>Enlace:</strong> <a id="modal-event-link" href="#" target="_blank"></a></p>
+                            <p><strong>Curso:</strong> <span id="modal-event-course"></span></p>
+                            <p><strong>Adjuntos:</strong> <ul id="modal-event-attachments"></ul></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" onclick="editEvent()">Editar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
     <footer class="mdl-mini-footer">

@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar IndexedDB
     const request = indexedDB.open('SyncCalDB', 1);
 
     request.onupgradeneeded = (event) => {
@@ -42,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.reset();
                 form.style.display = 'none';
                 addEventToCalendar(newEvent);
+                saveEventToGoogleCalendar(newEvent);
             };
 
             request.onerror = () => {
@@ -69,5 +69,44 @@ function addEventToCalendar(event) {
             attachments: event.attachments,
             course: event.course
         }
+    });
+}
+
+function saveEventToGoogleCalendar(event) {
+    if (accessToken === null) {
+        console.log('No access token available');
+        return;
+    }
+
+    const googleEvent = {
+        summary: event.title,
+        location: event.location,
+        description: event.description,
+        start: {
+            dateTime: event.start,
+            timeZone: 'America/Los_Angeles' // Ajustar según tu zona horaria
+        },
+        end: {
+            dateTime: event.end,
+            timeZone: 'America/Los_Angeles' // Ajustar según tu zona horaria
+        },
+        attachments: event.attachments.map(fileName => ({
+            fileUrl: fileName, // Esto asume que tienes una URL para los archivos adjuntos
+            title: fileName
+        })),
+        extendedProperties: {
+            shared: {
+                course: event.course
+            }
+        }
+    };
+
+    gapi.client.calendar.events.insert({
+        'calendarId': 'primary',
+        'resource': googleEvent
+    }).then(response => {
+        console.log('Evento guardado en Google Calendar:', response);
+    }).catch(error => {
+        console.error('Error al guardar el evento en Google Calendar:', error);
     });
 }
