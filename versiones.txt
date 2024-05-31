@@ -1,9 +1,20 @@
 Historial de Versiones
+Versión: 1.5.0
+Fecha: 2024-05-31
+Cambios:
+- Implementación de la funcionalidad para mostrar la información del usuario autenticado (nombre, correo electrónico, foto de perfil).
+- Creación de un formulario para la creación de eventos.
+- Almacenamiento de eventos en IndexedDB.
+- Integración de eventos creados con el calendario.
+- Correcion para mostrar el correo del usuario cuando está logueado (Intento 5).
+
 Versión: 1.4.21
 Fecha: 2024-05-31
 Cambios:
 - Solucion el error 'API_KEY is not defined'.
 - Informacion del usuario con sesion iniciada.
+- Pagina Responsive para variedad de dispositivos.
+- Correcion para mostrar el correo del usuario cuando está logueado (Intento 4).
 
 Versión: 1.4.2
 Fecha: 2024-05-31
