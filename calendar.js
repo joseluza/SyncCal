@@ -17,46 +17,35 @@ function initializeEmptyCalendar() {
         }
     });
     calendar.render();
+    loadEventsFromIndexedDB();
 }
 
-function loadCalendarEvents() {
-    if (accessToken === null) {
-        console.log('No access token available');
-        return;
-    }
+function loadEventsFromIndexedDB() {
+    const request = indexedDB.open('SyncCalDB', 1);
 
-    gapi.client.setToken({ access_token: accessToken });
-    gapi.client.calendar.events.list({
-        'calendarId': 'primary',
-        'timeMin': new Date().toISOString(),
-        'showDeleted': false,
-        'singleEvents': true,
-        'maxResults': 100,
-        'orderBy': 'startTime'
-    }).then((response) => {
-        var events = response.result.items.map(event => {
-            return {
-                id: event.id,
-                title: event.summary,
-                start: event.start.dateTime || event.start.date,
-                end: event.end.dateTime || event.end.date,
-                description: event.description,
-                location: event.location,
-                attachments: event.attachments,
-                link: event.htmlLink,
-                course: event.extendedProperties ? event.extendedProperties.shared.course : ''
-            };
-        });
-        calendar.addEventSource(events);
-    }).catch((error) => {
-        console.error('Error fetching calendar events:', error);
-    });
+    request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(['events'], 'readonly');
+        const objectStore = transaction.objectStore('events');
+        const request = objectStore.getAll();
+
+        request.onsuccess = (event) => {
+            const events = event.target.result;
+            events.forEach(event => {
+                calendar.addEvent(event);
+                addEventToPendingTasks(event);
+            });
+        };
+
+        request.onerror = (event) => {
+            console.error('Error al cargar eventos de IndexedDB: ' + event.target.errorCode);
+        };
+    };
+
+    request.onerror = (event) => {
+        console.error('Error en la base de datos: ' + event.target.errorCode);
+    };
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    initializeEmptyCalendar();
-    loadCalendarEvents();
-});
 
 function showEventForm(dateStr) {
     const form = document.getElementById('event-form');
@@ -71,23 +60,11 @@ function showEventDetails(event) {
     document.getElementById('modal-event-end').textContent = formatDateTime(event.end);
     document.getElementById('modal-event-location').textContent = event.location;
     document.getElementById('modal-event-description').textContent = event.description;
-    document.getElementById('modal-event-link').textContent = event.link;
-    document.getElementById('modal-event-link').href = event.link;
+    document.getElementById('modal-event-link').textContent = event.extendedProps.link;
+    document.getElementById('modal-event-link').href = event.extendedProps.link;
     document.getElementById('modal-event-course').textContent = event.extendedProps.course;
-
-    const attachmentsList = document.getElementById('modal-event-attachments');
-    attachmentsList.innerHTML = '';
-    if (event.extendedProps.attachments) {
-        event.extendedProps.attachments.forEach(attachment => {
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = attachment;
-            a.textContent = attachment;
-            a.target = '_blank';
-            li.appendChild(a);
-            attachmentsList.appendChild(li);
-        });
-    }
+    document.getElementById('modal-event-delivery').textContent = event.extendedProps.delivery;
+    document.getElementById('modal-event-importance').textContent = event.extendedProps.importance;
 
     const eventDetailsModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
     eventDetailsModal.show();
@@ -109,7 +86,8 @@ function editEvent() {
     const eventDescription = document.getElementById('modal-event-description').textContent;
     const eventLink = document.getElementById('modal-event-link').textContent;
     const eventCourse = document.getElementById('modal-event-course').textContent;
-    const eventAttachments = Array.from(document.getElementById('modal-event-attachments').children).map(li => li.textContent);
+    const eventDelivery = document.getElementById('modal-event-delivery').textContent;
+    const eventImportance = document.getElementById('modal-event-importance').textContent;
 
     document.getElementById('event-title').value = eventTitle;
     document.getElementById('event-start').value = new Date(eventStart).toISOString().slice(0, 16);
@@ -118,13 +96,15 @@ function editEvent() {
     document.getElementById('event-description').value = eventDescription;
     document.getElementById('event-link').value = eventLink;
     document.getElementById('event-course').value = eventCourse;
-    document.getElementById('event-attachments').dataset.attachments = JSON.stringify(eventAttachments);
+    document.getElementById('event-delivery').value = eventDelivery;
+    document.getElementById('event-importance').value = eventImportance;
 
     document.getElementById('event-form').style.display = 'block';
     const eventDetailsModal = bootstrap.Modal.getInstance(document.getElementById('eventDetailsModal'));
     eventDetailsModal.hide();
 
     document.getElementById('event-form').dataset.editing = true;
+    document.getElementById('event-form').dataset.id = event.id;
 }
 
 document.getElementById('event-form').addEventListener('submit', (e) => {
@@ -133,25 +113,24 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
     const isEditing = document.getElementById('event-form').dataset.editing === 'true';
 
     const updatedEvent = {
-        id: document.getElementById('modal-event-title').dataset.id,
+        id: isEditing ? document.getElementById('event-form').dataset.id : Date.now().toString(),
         title: document.getElementById('event-title').value,
         start: document.getElementById('event-start').value,
         end: document.getElementById('event-end').value,
         location: document.getElementById('event-location').value,
         description: document.getElementById('event-description').value,
-        attachments: JSON.parse(document.getElementById('event-attachments').dataset.attachments || '[]'),
         link: document.getElementById('event-link').value,
-        course: document.getElementById('event-course').value
+        course: document.getElementById('event-course').value,
+        delivery: document.getElementById('event-delivery').value,
+        importance: document.getElementById('event-importance').value
     };
 
     if (isEditing) {
-        // Lógica para actualizar un evento existente en IndexedDB y Google Calendar
+        // Lógica para actualizar un evento existente en IndexedDB
         updateEventInIndexedDB(updatedEvent);
-        updateEventInGoogleCalendar(updatedEvent);
     } else {
         // Lógica para añadir un nuevo evento
         addEventToIndexedDB(updatedEvent);
-        saveEventToGoogleCalendar(updatedEvent);
     }
 
     document.getElementById('event-form').reset();
@@ -178,10 +157,12 @@ function updateEventInIndexedDB(event) {
                 calendarEvent.setEnd(event.end);
                 calendarEvent.setExtendedProp('description', event.description);
                 calendarEvent.setExtendedProp('location', event.location);
-                calendarEvent.setExtendedProp('attachments', event.attachments);
                 calendarEvent.setExtendedProp('link', event.link);
                 calendarEvent.setExtendedProp('course', event.course);
+                calendarEvent.setExtendedProp('delivery', event.delivery);
+                calendarEvent.setExtendedProp('importance', event.importance);
             }
+            updateEventInPendingTasks(event);
         };
 
         request.onerror = () => {
@@ -192,47 +173,6 @@ function updateEventInIndexedDB(event) {
     request.onerror = (event) => {
         console.error('Error en la base de datos: ' + event.target.errorCode);
     };
-}
-
-function updateEventInGoogleCalendar(event) {
-    if (accessToken === null) {
-        console.log('No access token available');
-        return;
-    }
-
-    const googleEvent = {
-        id: event.id,
-        summary: event.title,
-        location: event.location,
-        description: event.description,
-        start: {
-            dateTime: event.start,
-            timeZone: 'America/Los_Angeles' // Ajustar según tu zona horaria
-        },
-        end: {
-            dateTime: event.end,
-            timeZone: 'America/Los_Angeles' // Ajustar según tu zona horaria
-        },
-        attachments: event.attachments.map(fileName => ({
-            fileUrl: fileName, // Esto asume que tienes una URL para los archivos adjuntos
-            title: fileName
-        })),
-        extendedProperties: {
-            shared: {
-                course: event.course
-            }
-        }
-    };
-
-    gapi.client.calendar.events.update({
-        'calendarId': 'primary',
-        'eventId': event.id,
-        'resource': googleEvent
-    }).then(response => {
-        console.log('Evento actualizado en Google Calendar:', response);
-    }).catch(error => {
-        console.error('Error al actualizar el evento en Google Calendar:', error);
-    });
 }
 
 function addEventToIndexedDB(event) {
@@ -247,6 +187,7 @@ function addEventToIndexedDB(event) {
         request.onsuccess = () => {
             console.log('El evento ha sido añadido a la base de datos.');
             addEventToCalendar(event);
+            addEventToPendingTasks(event);
         };
 
         request.onerror = () => {
@@ -271,47 +212,51 @@ function addEventToCalendar(event) {
         location: event.location,
         extendedProps: {
             link: event.link,
-            attachments: event.attachments,
-            course: event.course
+            course: event.course,
+            delivery: event.delivery,
+            importance: event.importance
         }
     });
 }
 
-function saveEventToGoogleCalendar(event) {
-    if (accessToken === null) {
-        console.log('No access token available');
-        return;
+function addEventToPendingTasks(event) {
+    const taskList = document.getElementById('pending-tasks-list');
+    const taskItem = document.createElement('li');
+    taskItem.textContent = `${event.title} - ${event.start}`;
+    taskList.appendChild(taskItem);
+}
+
+function updateEventInPendingTasks(event) {
+    const taskList = document.getElementById('pending-tasks-list');
+    const taskItems = Array.from(taskList.children);
+    const taskItem = taskItems.find(item => item.textContent.startsWith(event.title));
+    if (taskItem) {
+        taskItem.textContent = `${event.title} - ${event.start}`;
     }
+}
 
-    const googleEvent = {
-        summary: event.title,
-        location: event.location,
-        description: event.description,
-        start: {
-            dateTime: event.start,
-            timeZone: 'America/Los_Angeles' // Ajustar según tu zona horaria
-        },
-        end: {
-            dateTime: event.end,
-            timeZone: 'America/Los_Angeles' // Ajustar según tu zona horaria
-        },
-        attachments: event.attachments.map(fileName => ({
-            fileUrl: fileName, // Esto asume que tienes una URL para los archivos adjuntos
-            title: fileName
-        })),
-        extendedProperties: {
-            shared: {
-                course: event.course
-            }
-        }
-    };
+function filterByDate() {
+    const today = new Date().toISOString().split('T')[0];
+    const events = calendar.getEvents().filter(event => event.start >= today);
+    updatePendingTasks(events);
+}
 
-    gapi.client.calendar.events.insert({
-        'calendarId': 'primary',
-        'resource': googleEvent
-    }).then(response => {
-        console.log('Evento guardado en Google Calendar:', response);
-    }).catch(error => {
-        console.error('Error al guardar el evento en Google Calendar:', error);
+function filterByCourse() {
+    const course = prompt("Ingrese el nombre del curso para filtrar:");
+    const events = calendar.getEvents().filter(event => event.extendedProps.course.includes(course));
+    updatePendingTasks(events);
+}
+
+function filterByImportance() {
+    const importance = prompt("Ingrese el nivel de importancia para filtrar (ninguna, baja, media, alta, A1):");
+    const events = calendar.getEvents().filter(event => event.extendedProps.importance === importance);
+    updatePendingTasks(events);
+}
+
+function updatePendingTasks(events) {
+    const taskList = document.getElementById('pending-tasks-list');
+    taskList.innerHTML = '';
+    events.forEach(event => {
+        addEventToPendingTasks(event);
     });
 }

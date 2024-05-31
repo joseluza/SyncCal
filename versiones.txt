@@ -1,5 +1,15 @@
 Historial de Versiones
-Versión: 1.5.2
+Versión: 1.6.0
+Fecha: 2024-06-06
+Cambios:
+- Mejorada la funcionalidad para editar eventos.
+- Detalles del evento mostrados en un modal al hacer clic en un evento, incluyendo documentos adjuntos y enlaces.
+- Mejora en la visualización de fecha y hora en el formulario.
+- Guardado de datos en IndexedDB para persistencia local.
+- Implementación de filtros por próxima entrega, curso e importancia.
+- Adición de una sección de pendientes para mostrar las tareas pendientes.
+
+Versión: 1.5.21
 Fecha: 2024-05-31
 Cambios:
 - Mejora en la visualización de fecha y hora en el formulario.
@@ -12,7 +22,7 @@ Cambios:
 - Detalles del evento mostrados en un modal al hacer clic en un evento, incluyendo documentos adjuntos y enlaces.
 - Mejora en la visualización de fecha y hora en el formulario.
 - Guardado de datos en Google Calendar e IndexedDB como respaldo local.
-- Correcion para mostrar el correo del usuario cuando está logueado (Intento 6).
+- Correcion para mostrar el correo del usuario cuando está logueado (Intento 7).
 
 Versión: 1.5.1
 Fecha: 2024-05-31

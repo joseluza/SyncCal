@@ -62,16 +62,29 @@
                     <textarea class="form-control" id="event-description"></textarea>
                 </div>
                 <div class="mb-3">
-                    <label for="event-attachments" class="form-label">Adjuntos (Opcional)</label>
-                    <input type="file" class="form-control" id="event-attachments" multiple>
-                </div>
-                <div class="mb-3">
                     <label for="event-link" class="form-label">Enlace (Opcional)</label>
                     <input type="url" class="form-control" id="event-link">
                 </div>
                 <div class="mb-3">
                     <label for="event-course" class="form-label">Curso</label>
                     <input type="text" class="form-control" id="event-course">
+                </div>
+                <div class="mb-3">
+                    <label for="event-delivery" class="form-label">Es Entrega</label>
+                    <select class="form-select" id="event-delivery">
+                        <option value="no">No</option>
+                        <option value="si">Sí</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="event-importance" class="form-label">Importancia</label>
+                    <select class="form-select" id="event-importance">
+                        <option value="none">Ninguna</option>
+                        <option value="low">Baja</option>
+                        <option value="medium">Media</option>
+                        <option value="high">Alta</option>
+                        <option value="a1">A1</option>
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Crear Evento</button>
             </form>
@@ -90,7 +103,8 @@
                             <p><strong>Descripción:</strong> <span id="modal-event-description"></span></p>
                             <p><strong>Enlace:</strong> <a id="modal-event-link" href="#" target="_blank"></a></p>
                             <p><strong>Curso:</strong> <span id="modal-event-course"></span></p>
-                            <p><strong>Adjuntos:</strong> <ul id="modal-event-attachments"></ul></p>
+                            <p><strong>Es Entrega:</strong> <span id="modal-event-delivery"></span></p>
+                            <p><strong>Importancia:</strong> <span id="modal-event-importance"></span></p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -98,6 +112,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div id="pending-tasks" class="mt-4">
+                <h5>Tareas Pendientes</h5>
+                <ul id="pending-tasks-list"></ul>
             </div>
         </div>
     </main>
