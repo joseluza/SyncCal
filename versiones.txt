@@ -1,4 +1,10 @@
 Historial de Versiones
+Versión: 1.6.6
+Fecha: 2024-05-31
+Cambios:
+- Filtros.
+- Cambio de Sistema en Filtros.
+
 Versión: 1.6.5
 Fecha: 2024-05-31
 Cambios:

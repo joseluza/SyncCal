@@ -108,3 +108,31 @@ footer {
     padding: 0.5rem;
     border-bottom: 1px solid #ddd;
 }
+
+.pending-task {
+    margin: 5px 0;
+}
+
+.pending-task.delivery {
+    font-weight: bold;
+}
+
+.pending-task.none {
+    color: blue;
+}
+
+.pending-task.low {
+    color: green;
+}
+
+.pending-task.medium {
+    color: yellow;
+}
+
+.pending-task.high {
+    color: orange;
+}
+
+.pending-task.very-high {
+    color: red;
+}

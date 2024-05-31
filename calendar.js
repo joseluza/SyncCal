@@ -220,6 +220,30 @@ function addEventToPendingTasks(event) {
     const taskItem = document.createElement('li');
     taskItem.textContent = `${event.title} - ${event.start}`;
     taskItem.dataset.id = event.id;
+    taskItem.classList.add('pending-task');
+
+    if (event.delivery === 'si') {
+        taskItem.classList.add('delivery');
+    }
+
+    switch (event.importance) {
+        case 'baja':
+            taskItem.classList.add('low');
+            break;
+        case 'media':
+            taskItem.classList.add('medium');
+            break;
+        case 'alta':
+            taskItem.classList.add('high');
+            break;
+        case 'muy-alta':
+            taskItem.classList.add('very-high');
+            break;
+        default:
+            taskItem.classList.add('none');
+            break;
+    }
+
     taskList.appendChild(taskItem);
 }
 
@@ -229,6 +253,29 @@ function updateEventInPendingTasks(event) {
     const taskItem = taskItems.find(item => item.dataset.id === event.id);
     if (taskItem) {
         taskItem.textContent = `${event.title} - ${event.start}`;
+        taskItem.className = 'pending-task'; // Reset classes
+
+        if (event.delivery === 'si') {
+            taskItem.classList.add('delivery');
+        }
+
+        switch (event.importance) {
+            case 'baja':
+                taskItem.classList.add('low');
+                break;
+            case 'media':
+                taskItem.classList.add('medium');
+                break;
+            case 'alta':
+                taskItem.classList.add('high');
+                break;
+            case 'muy-alta':
+                taskItem.classList.add('very-high');
+                break;
+            default:
+                taskItem.classList.add('none');
+                break;
+        }
     }
 }
 
@@ -240,13 +287,13 @@ function filterByDate() {
 }
 
 function filterByCourse() {
-    const course = prompt("Ingrese el nombre del curso para filtrar:");
-    const events = calendar.getEvents().filter(event => event.extendedProps.course.includes(course));
+    const course = document.getElementById('event-course').value;
+    const events = calendar.getEvents().filter(event => event.extendedProps.course === course);
     updatePendingTasks(events);
 }
 
 function filterByImportance() {
-    const importance = prompt("Ingrese el nivel de importancia para filtrar (ninguna, baja, media, alta, A1):");
+    const importance = document.getElementById('event-importance').value;
     const events = calendar.getEvents().filter(event => event.extendedProps.importance === importance);
     updatePendingTasks(events);
 }
@@ -271,12 +318,10 @@ function deleteEvent(eventId) {
 
         deleteRequest.onsuccess = () => {
             console.log('El evento ha sido eliminado de la base de datos.');
-            // Eliminar el evento del calendario
             const calendarEvent = calendar.getEventById(eventId);
             if (calendarEvent) {
                 calendarEvent.remove();
             }
-            // Eliminar el evento de las tareas pendientes
             removeEventFromPendingTasks(eventId);
         };
 
@@ -290,6 +335,7 @@ function deleteEvent(eventId) {
     };
 }
 
+// Función para eliminar eventos de la lista de tareas pendientes
 function removeEventFromPendingTasks(eventId) {
     const taskList = document.getElementById('pending-tasks-list');
     const taskItems = Array.from(taskList.children);
@@ -298,4 +344,3 @@ function removeEventFromPendingTasks(eventId) {
         taskList.removeChild(taskItem);
     }
 }
-
