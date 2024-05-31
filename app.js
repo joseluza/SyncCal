@@ -1,5 +1,5 @@
-const CLIENT_ID = 'TU_CLIENT_ID'; // Reemplaza con tu ID de cliente de Google
-const API_KEY = 'TU_API_KEY'; // Reemplaza con tu clave de API de Google
+const CLIENT_ID = '1007808016979-rm131pqv458qpg0pk0qi1blhusdhfs5n.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyDdKNxOkM7gT9K50qTRQjhR-nW_C_MS_8c';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
