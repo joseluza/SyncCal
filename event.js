@@ -218,3 +218,5 @@ function clearPastEvents() {
         }
     });
 }
+
+//funcion
