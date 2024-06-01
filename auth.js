@@ -1,87 +1,78 @@
-const CLIENT_ID = 'TU_CLIENT_ID';
-const API_KEY = 'TU_API_KEY';
-const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
-const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+const CLIENT_ID = '1007808016979-rm131pqv458qpg0pk0qi1blhusdhfs5n.apps.googleusercontent.com';
+
+let tokenClient;
+let accessToken = null;
+let userProfile = null;
 
 function handleClientLoad() {
-    gapi.load('client:auth2', initClient);
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile',
+        callback: handleAuthResponse, // Define callback function for handling responses
+    });
 }
 
-function initClient() {
-    gapi.client.init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        discoveryDocs: DISCOVERY_DOCS,
-        scope: SCOPES
-    }).then(() => {
-        const authInstance = gapi.auth2.getAuthInstance();
-        authInstance.isSignedIn.listen(updateSigninStatus);
-        updateSigninStatus(authInstance.isSignedIn.get());
-    }, (error) => {
-        console.error(JSON.stringify(error, null, 2));
-    });
+function handleAuthResponse(response) {
+    if (response.error !== undefined) {
+        console.error('Error during authentication:', response.error);
+        throw response;
+    }
+    accessToken = response.access_token;
+    updateSigninStatus(true);
+    loadCalendarEvents();
+    getUserInfo(); // Fetch user profile information
+}
+
+function handleAuthClick() {
+    if (accessToken === null) {
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+    } else {
+        tokenClient.requestAccessToken({ prompt: '' });
+    }
+}
+
+function handleSignoutClick() {
+    if (accessToken) {
+        google.accounts.oauth2.revoke(accessToken, () => {
+            console.log('Access token revoked');
+            updateSigninStatus(false);
+        });
+    }
 }
 
 function updateSigninStatus(isSignedIn) {
     if (isSignedIn) {
-        const user = gapi.auth2.getAuthInstance().currentUser.get();
-        const profile = user.getBasicProfile();
-        userEmail = profile.getEmail();
-
-        document.getElementById('user-email').textContent = `Signed in as: ${profile.getEmail()}`;
+        document.getElementById('user-email').textContent = userProfile ? `Signed in as: ${userProfile.email}` : 'Signed in';
+        document.getElementById('user-info').style.display = 'flex';
         document.getElementById('sign-in-btn').style.display = 'none';
         document.getElementById('sign-out-btn').style.display = 'inline-block';
-        loadCalendarEvents();
     } else {
-        userEmail = '';
         document.getElementById('user-email').textContent = '';
+        document.getElementById('user-info').style.display = 'none';
         document.getElementById('sign-in-btn').style.display = 'inline-block';
         document.getElementById('sign-out-btn').style.display = 'none';
         initializeEmptyCalendar();
     }
 }
 
-function handleAuthClick() {
-    gapi.auth2.getAuthInstance().signIn();
-}
-
-function handleSignoutClick() {
-    gapi.auth2.getAuthInstance().signOut().then(() => {
-        updateSigninStatus(false);
+function getUserInfo() {
+    gapi.client.request({
+        'path': 'https://www.googleapis.com/oauth2/v3/userinfo',
+        'method': 'GET',
+        'headers': {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    }).then(response => {
+        userProfile = response.result;
+        document.getElementById('user-email').textContent = `Signed in as: ${userProfile.email}`;
+        document.getElementById('user-profile-picture').src = userProfile.picture;
+        document.getElementById('user-profile-picture').style.display = 'inline-block';
+        document.getElementById('user-name').textContent = userProfile.name;
+    }, error => {
+        console.error('Error fetching user profile:', error);
     });
 }
 
-function loadCalendarEvents() {
-    gapi.client.calendar.events.list({
-        'calendarId': 'primary',
-        'timeMin': new Date().toISOString(),
-        'showDeleted': false,
-        'singleEvents': true,
-        'maxResults': 100,
-        'orderBy': 'startTime'
-    }).then((response) => {
-        const events = response.result.items.map(event => {
-            return {
-                id: event.id,
-                title: event.summary,
-                start: event.start.dateTime || event.start.date,
-                end: event.end.dateTime || event.end.date,
-                description: event.description,
-                location: event.location,
-                extendedProps: {
-                    link: event.htmlLink,
-                    course: '',
-                    delivery: '',
-                    importance: ''
-                }
-            };
-        });
-
-        events.forEach(event => {
-            addEventToCalendar(event);
-            addEventToPendingTasks(event);
-        });
-    }).catch((error) => {
-        console.error('Error al cargar eventos de Google Calendar: ' + error);
-    });
-}
+document.addEventListener('DOMContentLoaded', () => {
+    handleClientLoad();
+});

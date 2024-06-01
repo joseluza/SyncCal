@@ -1,9 +1,14 @@
 Historial de Versiones
+Versión: 1.6.71
+Fecha: 2024-05-31
+Cambios:
+- Arreglo de la autenticación.
+
 Versión: 1.6.7
 Fecha: 2024-05-31
 Cambios:
 - Eliminacion de los filtros.
-- Eliminacion de IndexedDB
+- Eliminacion de IndexedDB.
 
 Versión: 1.6.6
 Fecha: 2024-05-31
