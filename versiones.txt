@@ -1,4 +1,11 @@
 Historial de Versiones
+Versión: 1.7.0
+Fecha: 2024-05-31
+Cambios:
+- Migracion a Node.js.
+- Migracion a MongoDB.
+- Implementacion de package.json
+
 Versión: 1.6.8
 Fecha: 2024-05-31
 Cambios:

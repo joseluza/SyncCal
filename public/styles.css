@@ -1,0 +1,144 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.mdl-layout__header {
+    background-color: #123740;
+    padding: 1rem;
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+    margin-right: 1rem;
+}
+
+.auth-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-container span {
+    font-weight: bold;
+    color: white;
+}
+
+.mdl-layout-title {
+    font-size: 1.5rem;
+    color: white;
+}
+
+main {
+    flex: 1;
+    padding: 1rem;
+}
+
+#calendar-container {
+    padding: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 80vh;
+}
+
+#calendar {
+    min-height: 70vh;
+}
+
+footer {
+    background-color: #123740;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    width: 100%;
+    position: relative;
+    bottom: 0;
+}
+
+.mdl-layout__header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.mdl-navigation {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+#event-form {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modal-body ul {
+    padding-left: 1.5rem;
+}
+
+#pending-tasks {
+    padding: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 80vh;
+}
+
+#pending-tasks h5 {
+    text-align: center;
+}
+
+#pending-tasks-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#pending-tasks-list li {
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.pending-task {
+    margin: 5px 0;
+}
+
+.pending-task.delivery {
+    font-weight: bold;
+}
+
+.pending-task.none {
+    color: #0000cd; /* Darker blue */
+}
+
+.pending-task.low {
+    color: #006400; /* Dark green */
+}
+
+.pending-task.medium {
+    color: #ff8c00; /* Dark orange */
+}
+
+.pending-task.high {
+    color: #ff4500; /* Dark red */
+}
+
+.pending-task.very-high {
+    color: #8b0000; /* Darker red */
+}

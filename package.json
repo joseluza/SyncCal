@@ -1,0 +1,17 @@
+{
+  "name": "synccal",
+  "version": "1.0.0",
+  "description": "SyncCal es una aplicación web que combina Google Calendar y el calendario de Outlook, permitiendo a los usuarios ver y gestionar eventos de ambos calendarios en un solo lugar. Los usuarios pueden filtrar eventos por fecha de entrega próxima, curso e importancia, y registrar eventos a través de las APIs de Google y Outlook.",
+  "main": "auth.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
