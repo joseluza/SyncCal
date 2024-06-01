@@ -6,6 +6,7 @@ function showEventForm(dateStr) {
     const form = document.getElementById('event-form');
     form.style.display = 'block';
     document.getElementById('event-start').value = dateStr + "T00:00";
+    document.getElementById('event-end').value = dateStr + "T23:59";
 }
 
 function showEventDetails(event) {
@@ -65,13 +66,23 @@ function editEvent() {
 document.getElementById('event-form').addEventListener('submit', (e) => {
     e.preventDefault();
 
+    const startDate = new Date(document.getElementById('event-start').value);
+    const endDate = new Date(document.getElementById('event-end').value);
+    const today = new Date();
+
+    // Verificar que la fecha de inicio y finalización no sean en el pasado
+    if (startDate < today || endDate < today) {
+        alert('No se pueden crear eventos en fechas pasadas.');
+        return;
+    }
+
     const isEditing = document.getElementById('event-form').dataset.editing === 'true';
 
     const updatedEvent = {
         id: isEditing ? document.getElementById('event-form').dataset.id : Date.now().toString(),
         title: document.getElementById('event-title').value,
         start: document.getElementById('event-start').value,
-        end: document.getElementById('event-start').value,
+        end: document.getElementById('event-end').value,
         location: document.getElementById('event-location').value,
         description: document.getElementById('event-description').value,
         link: document.getElementById('event-link').value,
@@ -81,37 +92,122 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
     };
 
     if (isEditing) {
-        updateEventInDatabase(updatedEvent);
+        updateEventInCalendar(updatedEvent);
     } else {
-        addEventToDatabase(updatedEvent);
+        addEventToCalendar(updatedEvent);
     }
 
-    form.reset();
-    form.style.display = 'none';
-    delete form.dataset.editing;
+    document.getElementById('event-form').reset();
+    document.getElementById('event-form').style.display = 'none';
+    delete document.getElementById('event-form').dataset.editing;
 });
 
-function addEventToDatabase(event) {
-    // Añadir la lógica para agregar el evento a la base de datos o API
+function addEventToCalendar(event) {
+    if (!calendar) return;
+
+    calendar.addEvent({
+        id: event.id,
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        description: event.description,
+        location: event.location,
+        extendedProps: {
+            link: event.link,
+            course: event.course,
+            delivery: event.delivery,
+            importance: event.importance
+        }
+    });
+    addEventToPendingTasks(event);
 }
 
-function updateEventInDatabase(event) {
-    // Añadir la lógica para actualizar el evento en la base de datos o API
+function updateEventInCalendar(event) {
+    const calendarEvent = calendar.getEventById(event.id);
+    if (calendarEvent) {
+        calendarEvent.setProp('title', event.title);
+        calendarEvent.setStart(event.start);
+        calendarEvent.setEnd(event.end);
+        calendarEvent.setExtendedProp('description', event.description);
+        calendarEvent.setExtendedProp('location', event.location);
+        calendarEvent.setExtendedProp('link', event.link);
+        calendarEvent.setExtendedProp('course', event.course);
+        calendarEvent.setExtendedProp('delivery', event.delivery);
+        calendarEvent.setExtendedProp('importance', event.importance);
+    }
+    updateEventInPendingTasks(event);
 }
 
 function deleteEvent(eventId) {
-    // Añadir la lógica para eliminar el evento de la base de datos o API
+    const calendarEvent = calendar.getEventById(eventId);
+    if (calendarEvent) {
+        calendarEvent.remove();
+    }
+    removeEventFromPendingTasks(eventId);
 }
 
 function addEventToPendingTasks(event) {
     const taskList = document.getElementById('pending-tasks-list');
     const taskItem = document.createElement('li');
     taskItem.textContent = `${event.title} - ${event.start}`;
-    taskItem.className = `pending-task ${event.importance}`;
+    taskItem.dataset.id = event.id;
+    taskItem.classList.add('pending-task');
+
     if (event.delivery === 'si') {
         taskItem.classList.add('delivery');
     }
+
+    switch (event.importance) {
+        case 'baja':
+            taskItem.classList.add('low');
+            break;
+        case 'media':
+            taskItem.classList.add('medium');
+            break;
+        case 'alta':
+            taskItem.classList.add('high');
+            break;
+        case 'muy-alta':
+            taskItem.classList.add('very-high');
+            break;
+        default:
+            taskItem.classList.add('none');
+            break;
+    }
+
     taskList.appendChild(taskItem);
+}
+
+function updateEventInPendingTasks(event) {
+    const taskList = document.getElementById('pending-tasks-list');
+    const taskItems = Array.from(taskList.children);
+    const taskItem = taskItems.find(item => item.dataset.id === event.id);
+    if (taskItem) {
+        taskItem.textContent = `${event.title} - ${event.start}`;
+        taskItem.className = 'pending-task'; // Reset classes
+
+        if (event.delivery === 'si') {
+            taskItem.classList.add('delivery');
+        }
+
+        switch (event.importance) {
+            case 'baja':
+                taskItem.classList.add('low');
+                break;
+            case 'media':
+                taskItem.classList.add('medium');
+                break;
+            case 'alta':
+                taskItem.classList.add('high');
+                break;
+            case 'muy-alta':
+                taskItem.classList.add('very-high');
+                break;
+            default:
+                taskItem.classList.add('none');
+                break;
+        }
+    }
 }
 
 function removeEventFromPendingTasks(eventId) {
@@ -122,3 +218,20 @@ function removeEventFromPendingTasks(eventId) {
         taskList.removeChild(taskItem);
     }
 }
+
+function clearPastEvents() {
+    const today = new Date().toISOString().split('T')[0];
+    const events = calendar.getEvents();
+    events.forEach(event => {
+        if (event.end < today) {
+            event.remove();
+            removeEventFromPendingTasks(event.id);
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeEmptyCalendar();
+    clearPastEvents(); // Clear past events on load
+});
+

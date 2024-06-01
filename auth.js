@@ -42,12 +42,17 @@ function handleSignoutClick() {
 
 function updateSigninStatus(isSignedIn) {
     if (isSignedIn) {
-        document.getElementById('user-email').textContent = userProfile ? `Signed in as: ${userProfile.email}` : 'Signed in';
+        document.getElementById('user-email').textContent = userProfile ? userProfile.email : 'Signed in';
+        document.getElementById('user-profile-picture').src = userProfile.picture;
+        document.getElementById('user-profile-picture').style.display = 'inline-block';
+        document.getElementById('user-name').textContent = userProfile.name;
         document.getElementById('user-info').style.display = 'flex';
         document.getElementById('sign-in-btn').style.display = 'none';
         document.getElementById('sign-out-btn').style.display = 'inline-block';
     } else {
         document.getElementById('user-email').textContent = '';
+        document.getElementById('user-profile-picture').style.display = 'none';
+        document.getElementById('user-name').textContent = '';
         document.getElementById('user-info').style.display = 'none';
         document.getElementById('sign-in-btn').style.display = 'inline-block';
         document.getElementById('sign-out-btn').style.display = 'none';
@@ -64,10 +69,7 @@ function getUserInfo() {
         }
     }).then(response => {
         userProfile = response.result;
-        document.getElementById('user-email').textContent = `Signed in as: ${userProfile.email}`;
-        document.getElementById('user-profile-picture').src = userProfile.picture;
-        document.getElementById('user-profile-picture').style.display = 'inline-block';
-        document.getElementById('user-name').textContent = userProfile.name;
+        updateSigninStatus(true); // Ensure status is updated after fetching user info
     }, error => {
         console.error('Error fetching user profile:', error);
     });

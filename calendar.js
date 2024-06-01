@@ -10,7 +10,12 @@ function initializeEmptyCalendar() {
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         dateClick: function(info) {
-            showEventForm(info.dateStr);
+            const today = new Date().toISOString().split('T')[0];
+            if (info.dateStr >= today) {
+                showEventForm(info.dateStr);
+            } else {
+                alert('No se pueden crear eventos en fechas pasadas.');
+            }
         },
         eventClick: function(info) {
             showEventDetails(info.event);
@@ -80,6 +85,16 @@ function editEvent() {
 
 document.getElementById('event-form').addEventListener('submit', (e) => {
     e.preventDefault();
+
+    const startDate = new Date(document.getElementById('event-start').value);
+    const endDate = new Date(document.getElementById('event-end').value);
+    const today = new Date();
+
+    // Verificar que la fecha de inicio y finalización no sean en el pasado
+    if (startDate < today || endDate < today) {
+        alert('No se pueden crear eventos en fechas pasadas.');
+        return;
+    }
 
     const isEditing = document.getElementById('event-form').dataset.editing === 'true';
 
@@ -207,14 +222,6 @@ function updateEventInPendingTasks(event) {
     }
 }
 
-function deleteEvent(eventId) {
-    const calendarEvent = calendar.getEventById(eventId);
-    if (calendarEvent) {
-        calendarEvent.remove();
-    }
-    removeEventFromPendingTasks(eventId);
-}
-
 function removeEventFromPendingTasks(eventId) {
     const taskList = document.getElementById('pending-tasks-list');
     const taskItems = Array.from(taskList.children);
@@ -223,3 +230,19 @@ function removeEventFromPendingTasks(eventId) {
         taskList.removeChild(taskItem);
     }
 }
+
+function clearPastEvents() {
+    const today = new Date().toISOString().split('T')[0];
+    const events = calendar.getEvents();
+    events.forEach(event => {
+        if (event.end < today) {
+            event.remove();
+            removeEventFromPendingTasks(event.id);
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeEmptyCalendar();
+    clearPastEvents(); // Clear past events on load
+});
