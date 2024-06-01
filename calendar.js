@@ -26,6 +26,7 @@ function initializeEmptyCalendar() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeEmptyCalendar();
+    clearPastEvents(); // Clear past events on load
 });
 
 function showEventForm(dateStr) {
@@ -39,8 +40,7 @@ function showEventDetails(event) {
     document.getElementById('modal-event-title').textContent = event.title;
     document.getElementById('modal-event-start').textContent = formatDateTime(event.start);
     document.getElementById('modal-event-end').textContent = formatDateTime(event.end);
-    document.getElementById('modal-event-location').textContent = event.location;
-    document.getElementById('modal-event-description').textContent = event.description;
+    document.getElementById('modal-event-description').textContent = event.extendedProps.description;
     document.getElementById('modal-event-link').textContent = event.extendedProps.link;
     document.getElementById('modal-event-link').href = event.extendedProps.link;
     document.getElementById('modal-event-course').textContent = event.extendedProps.course;
@@ -68,7 +68,6 @@ function editEvent() {
     document.getElementById('event-title').value = event.title;
     document.getElementById('event-start').value = new Date(event.start).toISOString().slice(0, 16);
     document.getElementById('event-end').value = new Date(event.end).toISOString().slice(0, 16);
-    document.getElementById('event-location').value = event.extendedProps.location;
     document.getElementById('event-description').value = event.extendedProps.description;
     document.getElementById('event-link').value = event.extendedProps.link;
     document.getElementById('event-course').value = event.extendedProps.course;
@@ -103,7 +102,6 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
         title: document.getElementById('event-title').value,
         start: document.getElementById('event-start').value,
         end: document.getElementById('event-end').value,
-        location: document.getElementById('event-location').value,
         description: document.getElementById('event-description').value,
         link: document.getElementById('event-link').value,
         course: document.getElementById('event-course').value,
@@ -129,7 +127,6 @@ function updateEventInCalendar(event) {
         calendarEvent.setStart(event.start);
         calendarEvent.setEnd(event.end);
         calendarEvent.setExtendedProp('description', event.description);
-        calendarEvent.setExtendedProp('location', event.location);
         calendarEvent.setExtendedProp('link', event.link);
         calendarEvent.setExtendedProp('course', event.course);
         calendarEvent.setExtendedProp('delivery', event.delivery);
@@ -147,7 +144,6 @@ function addEventToCalendar(event) {
         start: event.start,
         end: event.end,
         description: event.description,
-        location: event.location,
         extendedProps: {
             link: event.link,
             course: event.course,
@@ -164,6 +160,12 @@ function addEventToPendingTasks(event) {
     taskItem.textContent = `${event.title} - ${event.start}`;
     taskItem.dataset.id = event.id;
     taskItem.classList.add('pending-task');
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Eliminar';
+    deleteBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'ml-2');
+    deleteBtn.onclick = () => deleteEvent(event.id);
+    taskItem.appendChild(deleteBtn);
 
     if (event.delivery === 'si') {
         taskItem.classList.add('delivery');
@@ -220,6 +222,14 @@ function updateEventInPendingTasks(event) {
                 break;
         }
     }
+}
+
+function deleteEvent(eventId) {
+    const calendarEvent = calendar.getEventById(eventId);
+    if (calendarEvent) {
+        calendarEvent.remove();
+    }
+    removeEventFromPendingTasks(eventId);
 }
 
 function removeEventFromPendingTasks(eventId) {

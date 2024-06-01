@@ -1,4 +1,9 @@
 Historial de Versiones
+Versión: 1.6.8
+Fecha: 2024-05-31
+Cambios:
+- Mantenimiento total.
+
 Versión: 1.6.74
 Fecha: 2024-05-31
 Cambios:

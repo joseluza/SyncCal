@@ -41,7 +41,7 @@ main {
 
 #calendar-container {
     padding: 1rem;
-    background: #f0f0f0; /* Hacer el fondo un poco más oscuro */
+    background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     min-height: 80vh;
@@ -113,6 +113,9 @@ footer {
 #pending-tasks-list li {
     padding: 0.5rem;
     border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .pending-task {
@@ -124,21 +127,21 @@ footer {
 }
 
 .pending-task.none {
-    color: #1a1aff; /* Azul más oscuro */
+    color: blue;
 }
 
 .pending-task.low {
-    color: #007300; /* Verde más oscuro */
+    color: green;
 }
 
 .pending-task.medium {
-    color: #e6b800; /* Amarillo más oscuro */
+    color: yellow;
 }
 
 .pending-task.high {
-    color: #cc6600; /* Naranja más oscuro */
+    color: orange;
 }
 
 .pending-task.very-high {
-    color: #cc0000; /* Rojo más oscuro */
+    color: red;
 }
