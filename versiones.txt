@@ -2,8 +2,15 @@ Historial de Versiones
 Versión: 1.6.6
 Fecha: 2024-05-31
 Cambios:
+- Eliminacion de los filtros.
+- Eliminacion de IndexedDB
+
+Versión: 1.6.6
+Fecha: 2024-05-31
+Cambios:
 - Filtros.
 - Cambio de Sistema en Filtros.
+- Correcion para mostrar el correo del usuario cuando está logueado (Intento 8).
 
 Versión: 1.6.5
 Fecha: 2024-05-31

@@ -17,34 +17,6 @@ function initializeEmptyCalendar() {
         }
     });
     calendar.render();
-    loadEventsFromIndexedDB();
-}
-
-function loadEventsFromIndexedDB() {
-    const request = indexedDB.open('SyncCalDB', 1);
-
-    request.onsuccess = (event) => {
-        const db = event.target.result;
-        const transaction = db.transaction(['events'], 'readonly');
-        const objectStore = transaction.objectStore('events');
-        const request = objectStore.getAll();
-
-        request.onsuccess = (event) => {
-            const events = event.target.result;
-            events.forEach(event => {
-                addEventToCalendar(event);
-                addEventToPendingTasks(event);
-            });
-        };
-
-        request.onerror = (event) => {
-            console.error('Error al cargar eventos de IndexedDB: ' + event.target.errorCode);
-        };
-    };
-
-    request.onerror = (event) => {
-        console.error('Error en la base de datos: ' + event.target.errorCode);
-    };
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -125,9 +97,9 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
     };
 
     if (isEditing) {
-        updateEventInIndexedDB(updatedEvent);
+        updateEventInCalendar(updatedEvent);
     } else {
-        addEventToIndexedDB(updatedEvent);
+        addEventToCalendar(updatedEvent);
     }
 
     document.getElementById('event-form').reset();
@@ -135,65 +107,20 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
     delete document.getElementById('event-form').dataset.editing;
 });
 
-function updateEventInIndexedDB(event) {
-    const request = indexedDB.open('SyncCalDB', 1);
-
-    request.onsuccess = (event) => {
-        const db = event.target.result;
-        const transaction = db.transaction(['events'], 'readwrite');
-        const objectStore = transaction.objectStore('events');
-        const request = objectStore.put(event);
-
-        request.onsuccess = () => {
-            console.log('El evento ha sido actualizado en la base de datos.');
-            const calendarEvent = calendar.getEventById(event.id);
-            if (calendarEvent) {
-                calendarEvent.setProp('title', event.title);
-                calendarEvent.setStart(event.start);
-                calendarEvent.setEnd(event.end);
-                calendarEvent.setExtendedProp('description', event.description);
-                calendarEvent.setExtendedProp('location', event.location);
-                calendarEvent.setExtendedProp('link', event.link);
-                calendarEvent.setExtendedProp('course', event.course);
-                calendarEvent.setExtendedProp('delivery', event.delivery);
-                calendarEvent.setExtendedProp('importance', event.importance);
-            }
-            updateEventInPendingTasks(event);
-        };
-
-        request.onerror = () => {
-            console.error('Error al actualizar el evento en la base de datos.');
-        };
-    };
-
-    request.onerror = (event) => {
-        console.error('Error en la base de datos: ' + event.target.errorCode);
-    };
-}
-
-function addEventToIndexedDB(event) {
-    const request = indexedDB.open('SyncCalDB', 1);
-
-    request.onsuccess = (event) => {
-        const db = event.target.result;
-        const transaction = db.transaction(['events'], 'readwrite');
-        const objectStore = transaction.objectStore('events');
-        const request = objectStore.add(event);
-
-        request.onsuccess = () => {
-            console.log('El evento ha sido añadido a la base de datos.');
-            addEventToCalendar(event);
-            addEventToPendingTasks(event);
-        };
-
-        request.onerror = () => {
-            console.error('Error al añadir el evento a la base de datos.');
-        };
-    };
-
-    request.onerror = (event) => {
-        console.error('Error en la base de datos: ' + event.target.errorCode);
-    };
+function updateEventInCalendar(event) {
+    const calendarEvent = calendar.getEventById(event.id);
+    if (calendarEvent) {
+        calendarEvent.setProp('title', event.title);
+        calendarEvent.setStart(event.start);
+        calendarEvent.setEnd(event.end);
+        calendarEvent.setExtendedProp('description', event.description);
+        calendarEvent.setExtendedProp('location', event.location);
+        calendarEvent.setExtendedProp('link', event.link);
+        calendarEvent.setExtendedProp('course', event.course);
+        calendarEvent.setExtendedProp('delivery', event.delivery);
+        calendarEvent.setExtendedProp('importance', event.importance);
+    }
+    updateEventInPendingTasks(event);
 }
 
 function addEventToCalendar(event) {
@@ -213,6 +140,7 @@ function addEventToCalendar(event) {
             importance: event.importance
         }
     });
+    addEventToPendingTasks(event);
 }
 
 function addEventToPendingTasks(event) {
@@ -280,31 +208,11 @@ function updateEventInPendingTasks(event) {
 }
 
 function deleteEvent(eventId) {
-    const request = indexedDB.open('SyncCalDB', 1);
-
-    request.onsuccess = (event) => {
-        const db = event.target.result;
-        const transaction = db.transaction(['events'], 'readwrite');
-        const objectStore = transaction.objectStore('events');
-        const deleteRequest = objectStore.delete(eventId);
-
-        deleteRequest.onsuccess = () => {
-            console.log('El evento ha sido eliminado de la base de datos.');
-            const calendarEvent = calendar.getEventById(eventId);
-            if (calendarEvent) {
-                calendarEvent.remove();
-            }
-            removeEventFromPendingTasks(eventId);
-        };
-
-        deleteRequest.onerror = () => {
-            console.error('Error al eliminar el evento de la base de datos.');
-        };
-    };
-
-    request.onerror = (event) => {
-        console.error('Error en la base de datos: ' + event.target.errorCode);
-    };
+    const calendarEvent = calendar.getEventById(eventId);
+    if (calendarEvent) {
+        calendarEvent.remove();
+    }
+    removeEventFromPendingTasks(eventId);
 }
 
 function removeEventFromPendingTasks(eventId) {
