@@ -1,5 +1,5 @@
 Historial de Versiones
-Versión: 1.6.72
+Versión: 1.6.74
 Fecha: 2024-05-31
 Cambios:
 - Edicion.
