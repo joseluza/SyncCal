@@ -3,6 +3,7 @@ Versión: 1.6.71
 Fecha: 2024-05-31
 Cambios:
 - Arreglo de la autenticación.
+- Arreglo de los colores de pendientes.
 
 Versión: 1.6.7
 Fecha: 2024-05-31
