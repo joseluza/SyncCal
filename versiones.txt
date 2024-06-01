@@ -1,5 +1,5 @@
 Historial de Versiones
-Versión: 1.6.6
+Versión: 1.6.7
 Fecha: 2024-05-31
 Cambios:
 - Eliminacion de los filtros.
