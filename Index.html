@@ -46,7 +46,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="event-start" class="form-label">Fecha y Hora de Inicio</label>
-                            <input type="datetime-local" class="form-control" id="event-start" required>
+                            <input type="datetime-local" id="event-start" name="event-start" required min="">
+                            <input type="datetime-local" id="event-end" name="event-end" required min="">
                         </div>
                         <div class="mb-3">
                             <label for="event-end" class="form-label">Fecha y Hora de Finalización</label>

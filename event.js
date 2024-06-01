@@ -35,6 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 importance: document.getElementById('event-importance').value
             };
 
+            if (new Date(newEvent.start) < new Date()) {
+                alert('No se pueden crear eventos en fechas pasadas.');
+                return;
+            }
+
             if (form.dataset.editing) {
                 updateEventInIndexedDB(newEvent);
             } else {
@@ -45,9 +50,46 @@ document.addEventListener('DOMContentLoaded', () => {
             form.style.display = 'none';
             delete form.dataset.editing;
         });
+
+        deletePastEvents(db);
     };
 
     request.onerror = (event) => {
         console.error('Error en la base de datos: ' + event.target.errorCode);
     };
 });
+
+function deletePastEvents(db) {
+    const transaction = db.transaction(['events'], 'readwrite');
+    const objectStore = transaction.objectStore('events');
+    const request = objectStore.getAll();
+
+    request.onsuccess = (event) => {
+        const events = event.target.result;
+        const now = new Date();
+
+        events.forEach(event => {
+            if (new Date(event.end) < now) {
+                objectStore.delete(event.id);
+                deleteEvent(event.id);
+                removeEventFromPendingTasks(event.id);
+            }
+        });
+    };
+
+    request.onerror = (event) => {
+        console.error('Error al eliminar eventos pasados: ' + event.target.errorCode);
+    };
+}
+
+function showEventForm(dateStr) {
+    const form = document.getElementById('event-form');
+    form.style.display = 'block';
+
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById('event-start').min = today + "T00:00";
+    document.getElementById('event-end').min = today + "T00:00";
+
+    document.getElementById('event-start').value = dateStr + "T00:00";
+    document.getElementById('event-end').value = dateStr + "T23:59";
+}
