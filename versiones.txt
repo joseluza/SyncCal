@@ -2,6 +2,11 @@ Historial de Versiones
 Versión: 1.6.72
 Fecha: 2024-05-31
 Cambios:
+- Edicion.
+
+Versión: 1.6.72
+Fecha: 2024-05-31
+Cambios:
 - Validacion de fechas pasadas
 - Mejora de la edicion de eventos.
 - Correcion para mostrar el correo del usuario cuando está logueado (Intento 8).
