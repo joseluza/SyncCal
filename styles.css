@@ -13,8 +13,8 @@ body {
 }
 
 .logo {
-    width: 70px; /* Aumentar el tamaño del logo */
-    height: 70px; /* Aumentar el tamaño del logo */
+    width: 70px;
+    height: 70px;
     margin-right: 1rem;
 }
 
@@ -30,8 +30,8 @@ body {
 }
 
 .mdl-layout-title {
-    font-size: 1.5rem; /* Aumentar el tamaño del texto del título */
-    color: white; /* Asegurar que el texto sea visible */
+    font-size: 1.5rem;
+    color: white;
 }
 
 main {
@@ -113,9 +113,6 @@ footer {
 #pending-tasks-list li {
     padding: 0.5rem;
     border-bottom: 1px solid #ddd;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .pending-task {
@@ -127,21 +124,21 @@ footer {
 }
 
 .pending-task.none {
-    color: blue;
+    color: #0000cd; /* Darker blue */
 }
 
 .pending-task.low {
-    color: green;
+    color: #006400; /* Dark green */
 }
 
 .pending-task.medium {
-    color: yellow;
+    color: #ff8c00; /* Dark orange */
 }
 
 .pending-task.high {
-    color: orange;
+    color: #ff4500; /* Dark red */
 }
 
 .pending-task.very-high {
-    color: red;
+    color: #8b0000; /* Darker red */
 }
