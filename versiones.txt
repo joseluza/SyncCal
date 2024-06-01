@@ -1,9 +1,16 @@
 Historial de Versiones
+Versión: 1.6.72
+Fecha: 2024-05-31
+Cambios:
+- Mejora de la edicion de eventos.
+- Correcion para mostrar el correo del usuario cuando está logueado (Intento 8).
+
 Versión: 1.6.71
 Fecha: 2024-05-31
 Cambios:
 - Arreglo de la autenticación.
 - Arreglo de los colores de pendientes.
+- Mejora de la logica de los eventos.
 
 Versión: 1.6.7
 Fecha: 2024-05-31

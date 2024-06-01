@@ -45,13 +45,8 @@
                             <input type="text" class="form-control" id="event-title" required>
                         </div>
                         <div class="mb-3">
-                            <label for="event-start" class="form-label">Fecha y Hora de Inicio</label>
+                            <label for="event-start" class="form-label">Fecha y Hora del Evento</label>
                             <input type="datetime-local" id="event-start" name="event-start" required min="">
-                            <input type="datetime-local" id="event-end" name="event-end" required min="">
-                        </div>
-                        <div class="mb-3">
-                            <label for="event-end" class="form-label">Fecha y Hora de Finalización</label>
-                            <input type="datetime-local" class="form-control" id="event-end" required>
                         </div>
                         <div class="mb-3">
                             <label for="event-location" class="form-label">Ubicación</label>
@@ -132,7 +127,6 @@
     </div>
     <script src="auth.js"></script>
     <script src="calendar.js"></script> 
-    // Aqui habia un filters.js ;C
     <script src="event.js"></script>
     <script>
         fetch('versiones.txt')
