@@ -22,13 +22,15 @@
             </span>
             <div class="mdl-layout-spacer"></div>
             <nav class="mdl-navigation">
-                <div class="auth-container" id="user-info" style="display:none;">
-                    <img id="user-profile-picture" src="" alt="Foto de Perfil" style="width:30px; height:30px; border-radius:50%; margin-right:10px;">
+                <div class="auth-container">
+                    <img id="user-profile-picture" src="" alt="Foto de Perfil" style="display:none; width:30px; height:30px; border-radius:50%; margin-right:10px;">
                     <span id="user-email" class="mdl-navigation__link"></span>
                     <span id="user-name" class="mdl-navigation__link"></span>
+                    <button id="sign-in-btn" class="btn btn-secondary" onclick="handleAuthClick()">Iniciar Sesión</button>
+                    <div id="user-info" style="display: none;">
+                        <button id="sign-out-btn" class="btn btn-secondary" onclick="handleSignoutClick()" style="display: none;">Cerrar Sesión</button>
+                    </div>
                 </div>
-                <button id="sign-in-btn" class="btn btn-secondary" onclick="handleAuthClick()">Iniciar Sesión</button>
-                <button id="sign-out-btn" class="btn btn-secondary" onclick="handleSignoutClick()" style="display: none;">Cerrar Sesión</button>
             </nav>
         </div>
     </header>
@@ -48,11 +50,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="event-end" class="form-label">Fecha y Hora de Finalización</label>
-                            <input type="datetime-local" id="event-end" name="event-end" required min="">
-                        </div>
-                        <div class="mb-3">
-                            <label for="event-location" class="form-label">Ubicación</label>
-                            <input type="text" class="form-control" id="event-location">
+                            <input type="datetime-local" class="form-control" id="event-end" required>
                         </div>
                         <div class="mb-3">
                             <label for="event-description" class="form-label">Descripción</label>
@@ -112,7 +110,6 @@
                     <p><strong>Título:</strong> <span id="modal-event-title"></span></p>
                     <p><strong>Inicio:</strong> <span id="modal-event-start"></span></p>
                     <p><strong>Fin:</strong> <span id="modal-event-end"></span></p>
-                    <p><strong>Ubicación:</strong> <span id="modal-event-location"></span></p>
                     <p><strong>Descripción:</strong> <span id="modal-event-description"></span></p>
                     <p><strong>Enlace:</strong> <a id="modal-event-link" href="#" target="_blank"></a></p>
                     <p><strong>Curso:</strong> <span id="modal-event-course"></span></p>
@@ -129,7 +126,7 @@
     </div>
     <script src="auth.js"></script>
     <script src="calendar.js"></script> 
-    <script src="events.js"></script>
+    <script src="event.js"></script>
     <script>
         fetch('versiones.txt')
             .then(response => response.text())

@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     initializeEmptyCalendar();
+    clearPastEvents(); // Clear past events on load
 });
 
 function showEventForm(dateStr) {
@@ -13,8 +14,7 @@ function showEventDetails(event) {
     document.getElementById('modal-event-title').textContent = event.title;
     document.getElementById('modal-event-start').textContent = formatDateTime(event.start);
     document.getElementById('modal-event-end').textContent = formatDateTime(event.end);
-    document.getElementById('modal-event-location').textContent = event.location;
-    document.getElementById('modal-event-description').textContent = event.description;
+    document.getElementById('modal-event-description').textContent = event.extendedProps.description;
     document.getElementById('modal-event-link').textContent = event.extendedProps.link;
     document.getElementById('modal-event-link').href = event.extendedProps.link;
     document.getElementById('modal-event-course').textContent = event.extendedProps.course;
@@ -35,32 +35,24 @@ function formatDateTime(date) {
 }
 
 function editEvent() {
-    const eventTitle = document.getElementById('modal-event-title').textContent;
-    const eventStart = document.getElementById('modal-event-start').textContent;
-    const eventEnd = document.getElementById('modal-event-end').textContent;
-    const eventLocation = document.getElementById('modal-event-location').textContent;
-    const eventDescription = document.getElementById('modal-event-description').textContent;
-    const eventLink = document.getElementById('modal-event-link').textContent;
-    const eventCourse = document.getElementById('modal-event-course').textContent;
-    const eventDelivery = document.getElementById('modal-event-delivery').textContent;
-    const eventImportance = document.getElementById('modal-event-importance').textContent;
+    const eventId = document.getElementById('modal-event-title').dataset.id;
+    const event = calendar.getEventById(eventId);
 
-    document.getElementById('event-title').value = eventTitle;
-    document.getElementById('event-start').value = new Date(eventStart).toISOString().slice(0, 16);
-    document.getElementById('event-end').value = new Date(eventEnd).toISOString().slice(0, 16);
-    document.getElementById('event-location').value = eventLocation;
-    document.getElementById('event-description').value = eventDescription;
-    document.getElementById('event-link').value = eventLink;
-    document.getElementById('event-course').value = eventCourse;
-    document.getElementById('event-delivery').value = eventDelivery;
-    document.getElementById('event-importance').value = eventImportance;
+    document.getElementById('event-title').value = event.title;
+    document.getElementById('event-start').value = new Date(event.start).toISOString().slice(0, 16);
+    document.getElementById('event-end').value = new Date(event.end).toISOString().slice(0, 16);
+    document.getElementById('event-description').value = event.extendedProps.description;
+    document.getElementById('event-link').value = event.extendedProps.link;
+    document.getElementById('event-course').value = event.extendedProps.course;
+    document.getElementById('event-delivery').value = event.extendedProps.delivery;
+    document.getElementById('event-importance').value = event.extendedProps.importance;
 
     document.getElementById('event-form').style.display = 'block';
     const eventDetailsModal = bootstrap.Modal.getInstance(document.getElementById('eventDetailsModal'));
     eventDetailsModal.hide();
 
     document.getElementById('event-form').dataset.editing = true;
-    document.getElementById('event-form').dataset.id = event.id;
+    document.getElementById('event-form').dataset.id = eventId;
 }
 
 document.getElementById('event-form').addEventListener('submit', (e) => {
@@ -83,7 +75,6 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
         title: document.getElementById('event-title').value,
         start: document.getElementById('event-start').value,
         end: document.getElementById('event-end').value,
-        location: document.getElementById('event-location').value,
         description: document.getElementById('event-description').value,
         link: document.getElementById('event-link').value,
         course: document.getElementById('event-course').value,
@@ -111,7 +102,6 @@ function addEventToCalendar(event) {
         start: event.start,
         end: event.end,
         description: event.description,
-        location: event.location,
         extendedProps: {
             link: event.link,
             course: event.course,
@@ -129,7 +119,6 @@ function updateEventInCalendar(event) {
         calendarEvent.setStart(event.start);
         calendarEvent.setEnd(event.end);
         calendarEvent.setExtendedProp('description', event.description);
-        calendarEvent.setExtendedProp('location', event.location);
         calendarEvent.setExtendedProp('link', event.link);
         calendarEvent.setExtendedProp('course', event.course);
         calendarEvent.setExtendedProp('delivery', event.delivery);
@@ -229,9 +218,3 @@ function clearPastEvents() {
         }
     });
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    initializeEmptyCalendar();
-    clearPastEvents(); // Clear past events on load
-});
-
