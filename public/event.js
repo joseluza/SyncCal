@@ -1,7 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     initializeEmptyCalendar();
+    fetchEvents();
     clearPastEvents(); // Clear past events on load
 });
+
+function fetchEvents() {
+    fetch('/events')
+        .then(response => response.json())
+        .then(events => {
+            events.forEach(event => {
+                addEventToCalendar(event);
+            });
+        })
+        .catch(error => console.error('Error fetching events:', error));
+}
 
 function showEventForm(dateStr) {
     const form = document.getElementById('event-form');
@@ -85,7 +97,7 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
     if (isEditing) {
         updateEventInCalendar(updatedEvent);
     } else {
-        addEventToCalendar(updatedEvent);
+        addEventToDatabase(updatedEvent);
     }
 
     document.getElementById('event-form').reset();
@@ -97,7 +109,7 @@ function addEventToCalendar(event) {
     if (!calendar) return;
 
     calendar.addEvent({
-        id: event.id,
+        id: event._id, // Use the MongoDB ID
         title: event.title,
         start: event.start,
         end: event.end,
@@ -112,6 +124,21 @@ function addEventToCalendar(event) {
     addEventToPendingTasks(event);
 }
 
+function addEventToDatabase(event) {
+    fetch('/events', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(event)
+    })
+    .then(response => response.json())
+    .then(savedEvent => {
+        addEventToCalendar(savedEvent);
+    })
+    .catch(error => console.error('Error adding event:', error));
+}
+
 function updateEventInCalendar(event) {
     const calendarEvent = calendar.getEventById(event.id);
     if (calendarEvent) {
@@ -124,22 +151,43 @@ function updateEventInCalendar(event) {
         calendarEvent.setExtendedProp('delivery', event.delivery);
         calendarEvent.setExtendedProp('importance', event.importance);
     }
-    updateEventInPendingTasks(event);
+    updateEventInDatabase(event);
+}
+
+function updateEventInDatabase(event) {
+    fetch(`/events/${event.id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(event)
+    })
+    .then(response => response.json())
+    .then(updatedEvent => {
+        console.log('Event updated:', updatedEvent);
+    })
+    .catch(error => console.error('Error updating event:', error));
 }
 
 function deleteEvent(eventId) {
-    const calendarEvent = calendar.getEventById(eventId);
-    if (calendarEvent) {
-        calendarEvent.remove();
-    }
-    removeEventFromPendingTasks(eventId);
+    fetch(`/events/${eventId}`, {
+        method: 'DELETE'
+    })
+    .then(() => {
+        const calendarEvent = calendar.getEventById(eventId);
+        if (calendarEvent) {
+            calendarEvent.remove();
+        }
+        removeEventFromPendingTasks(eventId);
+    })
+    .catch(error => console.error('Error deleting event:', error));
 }
 
 function addEventToPendingTasks(event) {
     const taskList = document.getElementById('pending-tasks-list');
     const taskItem = document.createElement('li');
     taskItem.textContent = `${event.title} - ${event.start}`;
-    taskItem.dataset.id = event.id;
+    taskItem.dataset.id = event._id; // Use the MongoDB ID
     taskItem.classList.add('pending-task');
 
     if (event.delivery === 'si') {
@@ -213,10 +261,7 @@ function clearPastEvents() {
     const events = calendar.getEvents();
     events.forEach(event => {
         if (event.end < today) {
-            event.remove();
-            removeEventFromPendingTasks(event.id);
+            deleteEvent(event.id);
         }
     });
 }
-
-//funcion

@@ -1,4 +1,11 @@
 Historial de Versiones
+Versión: 1.7.1
+Fecha: 2024-05-31
+Cambios:
+- Update de Carpetas
+- Arreglo de Landing en el servidor
+- Primeras conexiones con MongoDB
+
 Versión: 1.7.0
 Fecha: 2024-05-31
 Cambios:

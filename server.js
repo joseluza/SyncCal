@@ -1,44 +1,62 @@
+// server.js
 const express = require('express');
 const mongoose = require('mongoose');
-const path = require('path');
-require('dotenv').config();
+const dotenv = require('dotenv');
+const Event = require('./models/event');
+
+dotenv.config({ path: './auth_mongodb.env' });
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Conectar a MongoDB
+app.use(express.json());
+app.use(express.static('public'));
+
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to Database'))
-.catch((error) => console.error('Database connection error:', error));
+    useUnifiedTopology: true
+}).then(() => console.log('Connected to Database'))
+  .catch((error) => console.error('Database connection error:', error));
 
-// Middleware para parsear JSON
-app.use(express.json());
-
-// Servir archivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Rutas de la API
-app.get('/api/events', (req, res) => {
-    // Aquí agregarás el código para obtener eventos de la base de datos
-    res.send('Obtener eventos');
+// Ruta para obtener todos los eventos
+app.get('/events', async (req, res) => {
+    try {
+        const events = await Event.find();
+        res.json(events);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
 });
 
-app.post('/api/events', (req, res) => {
-    // Aquí agregarás el código para agregar un nuevo evento a la base de datos
-    res.send('Agregar evento');
+// Ruta para crear un nuevo evento
+app.post('/events', async (req, res) => {
+    const newEvent = new Event(req.body);
+    try {
+        const savedEvent = await newEvent.save();
+        res.status(201).json(savedEvent);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
 });
 
-app.put('/api/events/:id', (req, res) => {
-    // Aquí agregarás el código para actualizar un evento existente en la base de datos
-    res.send('Actualizar evento');
+// Ruta para actualizar un evento
+app.put('/events/:id', async (req, res) => {
+    try {
+        const updatedEvent = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedEvent);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
 });
 
-app.delete('/api/events/:id', (req, res) => {
-    // Aquí agregarás el código para eliminar un evento de la base de datos
-    res.send('Eliminar evento');
+// Ruta para eliminar un evento
+app.delete('/events/:id', async (req, res) => {
+    try {
+        await Event.findByIdAndDelete(req.params.id);
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
 });
 
 app.listen(port, () => {
