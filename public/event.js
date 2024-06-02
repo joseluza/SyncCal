@@ -1,19 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     initializeEmptyCalendar();
-    fetchEvents();
     clearPastEvents(); // Clear past events on load
 });
-
-function fetchEvents() {
-    fetch('/events')
-        .then(response => response.json())
-        .then(events => {
-            events.forEach(event => {
-                addEventToCalendar(event);
-            });
-        })
-        .catch(error => console.error('Error fetching events:', error));
-}
 
 function showEventForm(dateStr) {
     const form = document.getElementById('event-form');
@@ -97,8 +85,20 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
     if (isEditing) {
         updateEventInCalendar(updatedEvent);
     } else {
-        addEventToDatabase(updatedEvent);
+        addEventToCalendar(updatedEvent);
     }
+
+    // Enviar el evento al servidor para guardarlo en MongoDB
+    fetch('/api/events', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedEvent)
+    })
+    .then(response => response.json())
+    .then(data => console.log('Evento guardado:', data))
+    .catch(error => console.error('Error al guardar el evento:', error));
 
     document.getElementById('event-form').reset();
     document.getElementById('event-form').style.display = 'none';
@@ -109,7 +109,7 @@ function addEventToCalendar(event) {
     if (!calendar) return;
 
     calendar.addEvent({
-        id: event._id, // Use the MongoDB ID
+        id: event.id,
         title: event.title,
         start: event.start,
         end: event.end,
@@ -124,21 +124,6 @@ function addEventToCalendar(event) {
     addEventToPendingTasks(event);
 }
 
-function addEventToDatabase(event) {
-    fetch('/events', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(event)
-    })
-    .then(response => response.json())
-    .then(savedEvent => {
-        addEventToCalendar(savedEvent);
-    })
-    .catch(error => console.error('Error adding event:', error));
-}
-
 function updateEventInCalendar(event) {
     const calendarEvent = calendar.getEventById(event.id);
     if (calendarEvent) {
@@ -151,43 +136,30 @@ function updateEventInCalendar(event) {
         calendarEvent.setExtendedProp('delivery', event.delivery);
         calendarEvent.setExtendedProp('importance', event.importance);
     }
-    updateEventInDatabase(event);
-}
-
-function updateEventInDatabase(event) {
-    fetch(`/events/${event.id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(event)
-    })
-    .then(response => response.json())
-    .then(updatedEvent => {
-        console.log('Event updated:', updatedEvent);
-    })
-    .catch(error => console.error('Error updating event:', error));
+    updateEventInPendingTasks(event);
 }
 
 function deleteEvent(eventId) {
-    fetch(`/events/${eventId}`, {
+    const calendarEvent = calendar.getEventById(eventId);
+    if (calendarEvent) {
+        calendarEvent.remove();
+    }
+    removeEventFromPendingTasks(eventId);
+
+    // Enviar solicitud para eliminar el evento de MongoDB
+    fetch(`/api/events/${eventId}`, {
         method: 'DELETE'
     })
-    .then(() => {
-        const calendarEvent = calendar.getEventById(eventId);
-        if (calendarEvent) {
-            calendarEvent.remove();
-        }
-        removeEventFromPendingTasks(eventId);
-    })
-    .catch(error => console.error('Error deleting event:', error));
+    .then(response => response.json())
+    .then(data => console.log('Evento eliminado:', data))
+    .catch(error => console.error('Error al eliminar el evento:', error));
 }
 
 function addEventToPendingTasks(event) {
     const taskList = document.getElementById('pending-tasks-list');
     const taskItem = document.createElement('li');
     taskItem.textContent = `${event.title} - ${event.start}`;
-    taskItem.dataset.id = event._id; // Use the MongoDB ID
+    taskItem.dataset.id = event.id;
     taskItem.classList.add('pending-task');
 
     if (event.delivery === 'si') {
@@ -261,7 +233,8 @@ function clearPastEvents() {
     const events = calendar.getEvents();
     events.forEach(event => {
         if (event.end < today) {
-            deleteEvent(event.id);
+            event.remove();
+            removeEventFromPendingTasks(event.id);
         }
     });
 }
