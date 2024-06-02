@@ -1,38 +1,36 @@
-const mongoose = require('mongoose');
 require('dotenv').config();
+const { MongoClient } = require('mongodb');
 
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+const uri = process.env.MONGODB_URI;
 
-const eventSchema = new mongoose.Schema({
-    id: String,
-    title: String,
-    start: String,
-    end: String,
-    description: String,
-    link: String,
-    course: String,
-    delivery: String,
-    importance: String
-});
+async function run() {
+    try {
+        const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-const Event = mongoose.model('Event', eventSchema);
+        await client.connect();
+        console.log("Connected to Database");
 
-const testEvent = new Event({
-    id: 'test123',
-    title: 'Test Event',
-    start: '2024-06-01T00:00:00',
-    end: '2024-06-01T23:59:59',
-    description: 'This is a test event',
-    link: 'https://example.com',
-    course: 'Test Course',
-    delivery: 'no',
-    importance: 'media'
-});
+        const database = client.db("syncCalDB");
+        const collection = database.collection("events");
 
-testEvent.save().then(() => {
-    console.log('Test event saved successfully!');
-    mongoose.connection.close();
-}).catch(error => {
-    console.error('Error saving test event:', error);
-    mongoose.connection.close();
-});
+        const testEvent = {
+            title: "Test Event",
+            start: new Date(),
+            end: new Date(),
+            description: "This is a test event",
+            link: "http://example.com",
+            course: "Example Course",
+            delivery: "no",
+            importance: "none"
+        };
+
+        await collection.insertOne(testEvent);
+        console.log("Test event saved successfully!");
+
+        await client.close();
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+run();
