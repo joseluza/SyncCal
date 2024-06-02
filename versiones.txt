@@ -4,6 +4,7 @@ Fecha: 2024-06-02
 Cambios:
 - Correciones En Autentificacion
 - Conexion de eventos con MongoDB
+- Inicios de servidor.
 
 Versión: 1.7.2
 Fecha: 2024-06-02
