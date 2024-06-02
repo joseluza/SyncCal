@@ -1,7 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
     initializeEmptyCalendar();
-    clearPastEvents(); // Clear past events on load
+    loadEvents(); // Cargar eventos al cargar la página
 });
+
+function loadEvents() {
+    const userEmail = localStorage.getItem('userEmail'); // Obtener correo del usuario
+    if (!userEmail) return;
+
+    fetch(`/events?email=${userEmail}`)
+        .then(response => response.json())
+        .then(events => {
+            events.forEach(event => {
+                addEventToCalendar(event);
+            });
+        })
+        .catch(error => console.error('Error loading events:', error));
+}
 
 function showEventForm(dateStr) {
     const form = document.getElementById('event-form');
@@ -79,7 +93,8 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
         link: document.getElementById('event-link').value,
         course: document.getElementById('event-course').value,
         delivery: document.getElementById('event-delivery').value,
-        importance: document.getElementById('event-importance').value
+        importance: document.getElementById('event-importance').value,
+        email: localStorage.getItem('userEmail') // Añadir correo del usuario
     };
 
     if (isEditing) {
@@ -88,22 +103,29 @@ document.getElementById('event-form').addEventListener('submit', (e) => {
         addEventToCalendar(updatedEvent);
     }
 
-    // Enviar el evento al servidor para guardarlo en MongoDB
-    fetch('/api/events', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedEvent)
-    })
-    .then(response => response.json())
-    .then(data => console.log('Evento guardado:', data))
-    .catch(error => console.error('Error al guardar el evento:', error));
+    saveEvent(updatedEvent); // Guardar el evento en MongoDB
 
     document.getElementById('event-form').reset();
     document.getElementById('event-form').style.display = 'none';
     delete document.getElementById('event-form').dataset.editing;
 });
+
+function saveEvent(event) {
+    fetch('/events', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(event),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Event saved:', data);
+        })
+        .catch((error) => {
+            console.error('Error saving event:', error);
+        });
+}
 
 function addEventToCalendar(event) {
     if (!calendar) return;
@@ -118,7 +140,8 @@ function addEventToCalendar(event) {
             link: event.link,
             course: event.course,
             delivery: event.delivery,
-            importance: event.importance
+            importance: event.importance,
+            email: event.email
         }
     });
     addEventToPendingTasks(event);
@@ -145,14 +168,20 @@ function deleteEvent(eventId) {
         calendarEvent.remove();
     }
     removeEventFromPendingTasks(eventId);
+    removeEventFromDatabase(eventId); // Eliminar el evento de MongoDB
+}
 
-    // Enviar solicitud para eliminar el evento de MongoDB
-    fetch(`/api/events/${eventId}`, {
-        method: 'DELETE'
+function removeEventFromDatabase(eventId) {
+    fetch(`/events/${eventId}`, {
+        method: 'DELETE',
     })
-    .then(response => response.json())
-    .then(data => console.log('Evento eliminado:', data))
-    .catch(error => console.error('Error al eliminar el evento:', error));
+        .then(response => response.json())
+        .then(data => {
+            console.log('Event deleted:', data);
+        })
+        .catch((error) => {
+            console.error('Error deleting event:', error);
+        });
 }
 
 function addEventToPendingTasks(event) {

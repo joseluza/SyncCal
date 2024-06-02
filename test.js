@@ -1,7 +1,8 @@
-require('dotenv').config();
+require('dotenv').config({ path: './auth_mongodb.env' });  // Cambia el path si tu archivo .env tiene un nombre diferente
 const { MongoClient } = require('mongodb');
 
 const uri = process.env.MONGODB_URI;
+console.log('MONGODB_URI:', uri); // Añade esta línea para depuración
 
 async function run() {
     try {

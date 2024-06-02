@@ -1,20 +1,31 @@
 Historial de Versiones
+Versión: 1.7.3
+Fecha: 2024-06-02
+Cambios:
+- Correciones En Autentificacion
+- Conexion de eventos con MongoDB
+
+Versión: 1.7.2
+Fecha: 2024-06-02
+Cambios:
+- Queue en MongoDB.
+
 Versión: 1.7.1
-Fecha: 2024-05-31
+Fecha: 2024-06-01
 Cambios:
 - Update de Carpetas
 - Arreglo de Landing en el servidor
 - Primeras conexiones con MongoDB
 
 Versión: 1.7.0
-Fecha: 2024-05-31
+Fecha: 2024-06-01
 Cambios:
 - Migracion a Node.js.
 - Migracion a MongoDB.
 - Implementacion de package.json
 
 Versión: 1.6.8
-Fecha: 2024-05-31
+Fecha: 2024-06-01
 Cambios:
 - Mantenimiento total.
 

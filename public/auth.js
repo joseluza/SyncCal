@@ -18,7 +18,6 @@ function handleAuthResponse(response) {
         throw response;
     }
     accessToken = response.access_token;
-    updateSigninStatus(true);
     loadCalendarEvents();
     getUserInfo(); // Fetch user profile information
 }
@@ -36,6 +35,7 @@ function handleSignoutClick() {
         google.accounts.oauth2.revoke(accessToken, () => {
             console.log('Access token revoked');
             updateSigninStatus(false);
+            localStorage.removeItem('userEmail'); // Remove user email from localStorage
         });
     }
 }
@@ -49,6 +49,7 @@ function updateSigninStatus(isSignedIn) {
         document.getElementById('user-info').style.display = 'flex';
         document.getElementById('sign-in-btn').style.display = 'none';
         document.getElementById('sign-out-btn').style.display = 'inline-block';
+        localStorage.setItem('userEmail', userProfile.email); // Store user email in localStorage
     } else {
         document.getElementById('user-email').textContent = '';
         document.getElementById('user-profile-picture').style.display = 'none';
@@ -57,6 +58,7 @@ function updateSigninStatus(isSignedIn) {
         document.getElementById('sign-in-btn').style.display = 'inline-block';
         document.getElementById('sign-out-btn').style.display = 'none';
         initializeEmptyCalendar();
+        localStorage.removeItem('userEmail'); // Remove user email from localStorage
     }
 }
 
